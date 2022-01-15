@@ -3,14 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GOTPlaner.Models
 {
-    public class TourVerificationStatus
+    public class ElementType
     {
         [Key]
-        [Required]
-        public TourVerificationStatusId TourVerificationStatusId { get; set; }
+        public ElementTypeId ElementTypeId { get; set; }
         [Required]
         [MaxLength(255)]
         public string Name { get; set; }
-        public IEnumerable<TourVerification> TourVerifications { get; set; }
+        public IEnumerable<Segment> Segments { get; set; }
     }
 }
