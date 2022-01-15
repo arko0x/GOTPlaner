@@ -29,7 +29,7 @@ namespace GOTPlaner.Data
                 .HasIndex(l => l.IDCard)
                 .IsUnique();
             modelBuilder.Entity<TouristPoint>()
-                .HasIndex(tp => tp.Name)
+                .HasIndex(tp => new { tp.Name, tp.MountainRangeId })
                 .IsUnique();
             modelBuilder.Entity<MountainGroup>()
                 .HasIndex(mg => mg.Name)
@@ -74,6 +74,12 @@ namespace GOTPlaner.Data
             modelBuilder.Entity<Segment>()
                 .HasMany(s => s.SegmentCloses)
                 .WithOne(sc => sc.Segment);
+            modelBuilder.Entity<TouristPoint>()
+                .HasMany(t => t.SegmentsA)
+                .WithOne(s => s.TouristPointA);
+            modelBuilder.Entity<TouristPoint>()
+                .HasMany(t => t.SegmentsB)
+                .WithOne(s => s.TouristPointB);
             modelBuilder.Entity<Segment>()
                 .Property(s => s.ElementTypeId)
                 .HasConversion<int>();
@@ -149,6 +155,22 @@ namespace GOTPlaner.Data
                     Name = e.ToString()
                 }));
 
+            modelBuilder.Entity<Segment>()
+                .HasIndex(s => new { s.TouristPointAId, s.TouristPointBId})
+                .IsUnique();
+
+            // data initialization
+            modelBuilder.Entity<Tourist>()
+                .HasData(
+                new Tourist
+                {
+                    Email = "jkowalski1@gmail.com",
+                    FirstName = "Jan",
+                    LastName = "Kowalski",
+                    BirthDate = DateTime.Parse("1998-01-01"),
+                    Password = "plain",
+                    Disability = false
+                });
         }
 
         // entities

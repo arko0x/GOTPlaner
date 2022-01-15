@@ -1,0 +1,53 @@
+﻿@model IEnumerable<GOTPlaner.Models.Segment>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Odcinki</h1>
+
+<p>
+    <a asp-action="Create">Utwórz Nowy</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PointsAB)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PointsBA)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LevelDifferenceSum)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NumberOfKilometers)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PointsAB)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PointsBA)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LevelDifferenceSum)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumberOfKilometers)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

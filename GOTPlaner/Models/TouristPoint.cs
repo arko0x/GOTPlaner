@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace GOTPlaner.Models
 {
@@ -14,5 +15,7 @@ namespace GOTPlaner.Models
         [Required]
         public ElementTypeId ElementTypeId { get; set; }
         public ElementType ElementType { get; set; }
+        public IEnumerable<Segment> SegmentsA { get; set; }
+        public IEnumerable<Segment> SegmentsB { get; set; }
     }
 }
