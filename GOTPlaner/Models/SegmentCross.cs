@@ -14,7 +14,8 @@ namespace GOTPlaner.Models
         public Segment Segment { get; set; }
         [Required]
         public int Order { get; set; }
-        public DateTime CrossDate { get; set; }
+        public Nullable<DateTime> CrossDate { get; set; }
+        [MaxLength(255)]
         public string ImageName { get; set; }
     }
 }

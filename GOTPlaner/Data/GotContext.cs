@@ -75,7 +75,7 @@ namespace GOTPlaner.Data
                 .HasMany(s => s.SegmentCloses)
                 .WithOne(sc => sc.Segment);
             modelBuilder.Entity<Segment>()
-                .Property(s => s.SegmentTypeId)
+                .Property(s => s.ElementTypeId)
                 .HasConversion<int>();
             modelBuilder.Entity<TouristPoint>()
                 .Property(t => t.ElementTypeId)
@@ -148,6 +148,7 @@ namespace GOTPlaner.Data
                     TourVerificationStatusId = e,
                     Name = e.ToString()
                 }));
+
         }
 
         // entities

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GOTPlaner.Models
@@ -14,14 +15,13 @@ namespace GOTPlaner.Models
         public TouristPoint TouristPointB { get; set; }
         [Required]
         public int PointsAB { get; set; }
-        public int PointsBA { get; set; }
+        public Nullable<int> PointsBA { get; set; }
         [Required]
         public int LevelDifferenceSum { get; set; }
         [Required]
         public int NumberOfKilometers { get; set; }
         [Required]
-        public int SegmentTypeId { get; set; }
-        public ElementTypeId SegmentType { get; set; }
+        public ElementTypeId ElementTypeId { get; set; }
         public IEnumerable<SegmentCross> SegmentCrosses { get; set; }
         public IEnumerable<CloseSegment> SegmentCloses { get; set; }
     }

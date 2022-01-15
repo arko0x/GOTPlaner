@@ -12,8 +12,8 @@ namespace GOTPlaner.Models
         public int ID { get; set; }
         [Required]
         public DateTime CreationDate { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public Nullable<DateTime> StartDate { get; set; }
+        public Nullable<DateTime> EndDate { get; set; }
         [Required]
         public Tourist Tourist { get; set; }
         [Required]

@@ -7,6 +7,7 @@ namespace GOTPlaner.Models
         [Key]
         [Required]
         public int ID { get; set; }
+        [Required]
         public Leader Leader { get; set; }
         [Required]
         public MountainGroupId MountainGroupId { get; set; }
