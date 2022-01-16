@@ -23,23 +23,9 @@ namespace GOTPlaner.Controllers.API
 
         // GET: api/TouristPoints
         [HttpGet]
-        public  ActionResult<IEnumerable<TouristPoint>> GetTouristPoints()
+        public  ActionResult<IEnumerable<string>> GetTouristPoints()
         {
-            var touristPoints = new List<TouristPoint>();
-            touristPoints.Add(new TouristPoint
-            {
-                ID = 1,
-                Name = "BLABLABLA",
-                ElementType = new ElementType { ElementTypeId = ElementTypeId.SystemType, Name = "Systemowy" }
-            });
-            touristPoints.Add(new TouristPoint
-            {
-                ID = 1,
-                Name = "BLABLABLA",
-                ElementType = new ElementType { ElementTypeId = ElementTypeId.SystemType, Name = "Systemowy" }
-            });
-            return  touristPoints;
-            //return await _context.TouristPoints.ToListAsync();
+            return _context.TouristPoints.Select(e => e.Name).Distinct().ToList();
         }
 
         // GET: api/TouristPoints/5

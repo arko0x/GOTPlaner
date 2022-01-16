@@ -121,6 +121,7 @@ namespace GOTPlaner.Controllers.Admin
                               s.TouristPointB.Name.Equals(createSegmentViewModel.PointA) && s.TouristPointA.Name.Equals(createSegmentViewModel.PointB)).FirstOrDefault();
                     if (segm != null)
                     {
+                        createSegmentViewModel.IsSegmentAlreadyInASystem = true;
                         createSegmentViewModel.MountainRanges = _context.MountainRanges.ToList();
                         return View(createSegmentViewModel);
                     }
@@ -141,6 +142,7 @@ namespace GOTPlaner.Controllers.Admin
                 return RedirectToAction(nameof(Index));
             }
             createSegmentViewModel.MountainRanges = _context.MountainRanges.ToList();
+            createSegmentViewModel.IsSegmentAlreadyInASystem = false;
             return View(createSegmentViewModel);
         }
 

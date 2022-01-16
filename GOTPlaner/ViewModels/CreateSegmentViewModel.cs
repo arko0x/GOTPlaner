@@ -25,5 +25,6 @@ namespace GOTPlaner.ViewModels
         public MountainRangeId MountainRangeAId { get; set; }
         [Required]
         public MountainRangeId MountainRangeBId { get; set; }
+        public bool IsSegmentAlreadyInASystem { get; set; }
     }
 }

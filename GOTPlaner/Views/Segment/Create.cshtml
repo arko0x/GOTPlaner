@@ -12,53 +12,62 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="PointA" class="control-label">Punkt A</label>
-                <input asp-for="PointA" id="PointA" class="form-control" />
+                @if (Model.IsSegmentAlreadyInASystem) {
+                    <span class="text-danger">Taki odcinek istnieje już w systemie!</span>
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="PointA" class="control-label">Punkt A: </label>
+                <input asp-for="PointA" class="form-control basicAutoComplete" id="PointA" />
                 <span asp-validation-for="PointA" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="MountainRangeAId" class="control-label">Pasmo górskie: </label>
                 <select asp-for="MountainRangeAId" asp-items="@(new SelectList(Model.MountainRanges, nameof(MountainRange.MountainRangeId), nameof(MountainRange.Name)))">
-                    <option>Please select one</option>
                 </select>
             </div>
             <div class="form-group">
-                <label asp-for="PointB" class="control-label">Punkt B</label>
-                <input asp-for="PointB" class="form-control" />
+                <label asp-for="PointB" class="control-label">Punkt B: </label>
+                <input asp-for="PointB" class="form-control basicAutoComplete" />
                 <span asp-validation-for="PointB" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="MountainRangeBId" class="control-label">Pasmo górskie: </label>
                 <select asp-for="MountainRangeBId" asp-items="@(new SelectList(Model.MountainRanges, nameof(MountainRange.MountainRangeId), nameof(MountainRange.Name)))">
-                    <option>Please select one</option>
                 </select>
             </div>
+
             <div class="form-group">
-                <label asp-for="PointsAB" class="control-label"></label>
+                <label asp-for="PointsAB" class="control-label">Punkty AB: </label>
                 <input asp-for="PointsAB" class="form-control" />
                 <span asp-validation-for="PointsAB" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PointsBA" class="control-label"></label>
+                <label asp-for="PointsBA" class="control-label">Punkty BA: </label>
                 <input asp-for="PointsBA" class="form-control" />
                 <span asp-validation-for="PointsBA" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="LevelDifferenceSum" class="control-label"></label>
-                <input asp-for="LevelDifferenceSum" class="form-control" />
-                <span asp-validation-for="LevelDifferenceSum" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NumberOfKilometers" class="control-label"></label>
+                <label asp-for="NumberOfKilometers" class="control-label">Liczba kiometrów: </label>
                 <input asp-for="NumberOfKilometers" class="form-control" />
                 <span asp-validation-for="NumberOfKilometers" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <label asp-for="LevelDifferenceSum" class="control-label">Suma różnic poziomów: </label>
+                <input asp-for="LevelDifferenceSum" class="form-control" />
+                <span asp-validation-for="LevelDifferenceSum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Dodaj odcinek" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Powrót do listy odcinków</a>
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="@Url.Content("~/js/createSegment.js")"></script>
 }
