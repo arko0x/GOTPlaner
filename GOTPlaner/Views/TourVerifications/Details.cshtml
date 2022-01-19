@@ -1,0 +1,193 @@
+﻿@model GOTPlaner.Models.TourVerification
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+<dl>
+    <div style="float: left">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Status.Name)
+        </dd>
+    </div>
+    @if (Model.LeaderEmail != null)
+    {
+        <div style="float: right; width:45%">
+            <dt class="col-sm-2" style="display: inline">
+                @Html.DisplayNameFor(model => model.Reason)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Reason)
+            </dd>
+        </div>
+
+        <div style="float: right">
+            <dt class="col-sm-2" style="display: inline">
+                First Verifiactor
+            </dt>
+            <dd class="col-sm-10"  style="word-wrap: break-word">
+                @{var leaderData = (Model.Leader.FirstName.ToString() + ' ' + Model.Leader.LastName.ToString());}
+                @Html.DisplayFor(model => leaderData)
+            </dd>
+        </div>
+    }
+</dl>
+</div>
+<br>
+<br>
+<br>
+<div>
+    <h4>Wycieczka #@Html.DisplayFor(model => model.TourId)</h4>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Lp.
+            </th>
+            <th>
+                Punkt poczatkowy
+            </th>
+            <th>
+                Punkt końcowy
+            </th>
+            <th>
+                Typ odcinka
+            </th>
+            <th>
+                Data i godzina dotarcia
+            </th>
+            <th>
+                Punkty
+            </th>
+            <th>
+                Kilometry
+            </th>
+            <th>
+                Suma podejść
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Tour.SegmentCrosses)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(i => item.Order)
+                </td>
+                <td>
+                    @if (item.Direction)
+                    {
+                        @Html.DisplayFor(i => item.Segment.TouristPointA.Name)
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(i => item.Segment.TouristPointB.Name)
+                    }
+                </td>
+                <td>
+                    @if (item.Direction)
+                    {
+                        @Html.DisplayFor(i => item.Segment.TouristPointB.Name)
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(i => item.Segment.TouristPointA.Name)
+                    }
+                </td>
+                <td>
+                    @if (item.Segment.ElementTypeId == ElementTypeId.SystemType)
+                    {
+                        <text>Systemowy</text>
+                    }
+                    else
+                    {
+                         <text>Użytkownika</text>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.CrossDate)
+                </td>
+                <td>
+                    @if (item.Direction)
+                    {
+                        @Html.DisplayFor(i => item.Segment.PointsAB)
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(i => item.Segment.PointsBA)
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.Segment.NumberOfKilometers)
+                </td>
+                <td>
+                    @Html.DisplayFor(i => item.Segment.LevelDifferenceSum)
+                    <text> m</text>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td colspan=4></td>
+            <td>
+                <b>SUMA</b>
+            </td>
+            <td>
+                @ViewBag.Points
+            </td>
+            <td>
+                @ViewBag.Kilometers
+            </td>
+            <td>
+                @ViewBag.LevelDiff
+                <text> m</text>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h4>Zdjęcia z punktów końcowych</h4>
+<container style="display: flex; flex-wrap: wrap">
+    @foreach (var item in Model.Tour.SegmentCrosses)
+    {
+        <div style="margin: 0px 50px 25px 0px">
+         <dl>
+            <dt>
+                @item.Order<text>. </text>
+                @if (item.Direction)
+                {
+                    @Html.DisplayFor(i => item.Segment.TouristPointB.Name)
+                }
+                else
+                {
+                    @Html.DisplayFor(i => item.Segment.TouristPointA.Name)
+                }
+            </dt>
+        </dl>
+        <dd>
+            <img src="@("~/upload/" + item.ImageName)" asp-append-version=true width="500px" height="500px" />
+        </dd>
+        </div>
+
+    }
+</container>
+<form asp-action="Reject">
+    <input type="hidden" asp-for="ID"/>
+    <input type="submit" value="Odrzuć" class="btn btn-danger"/>
+    <input type="button" value="Zatwierdź" class="btn btn-primary" 
+        style="float: right; margin-right: 55px" onclick="@("window.location.href='" + @Url.Action("Confirm", "TourVerifications", new {ID = Model.ID}) + "'");"/>
+    <br>
+    <br>
+    <p>
+        <textarea id="reason" name="reason" rows=6 style="width: 50%" required></textarea>
+    </p>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
