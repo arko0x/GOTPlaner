@@ -8,7 +8,10 @@ namespace GOTPlaner.Models
         [Key]
         [Required]
         public int ID { get; set; }
+        [Required]
+        public int TourId { get; set; }
         public Tour Tour { get; set; }
+        public string LeaderEmail { get; set; }
         public Leader Leader { get; set; }
         [MaxLength(255)]
         public string Reason { get; set; }

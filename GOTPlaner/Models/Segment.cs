@@ -24,7 +24,7 @@ namespace GOTPlaner.Models
         [Required]
         public int LevelDifferenceSum { get; set; }
         [Required]
-        public int NumberOfKilometers { get; set; }
+        public double NumberOfKilometers { get; set; }
         [Required]
         public ElementTypeId ElementTypeId { get; set; }
         public ElementType ElementType { get; set; }
