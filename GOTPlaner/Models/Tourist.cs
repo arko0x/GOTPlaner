@@ -32,5 +32,6 @@ namespace GOTPlaner.Models
         public bool Disability { get; set; }
         public IEnumerable<Badge> Badges { get; set; }
         public IEnumerable<Tour> Tours { get; set; }
+
     }
 }

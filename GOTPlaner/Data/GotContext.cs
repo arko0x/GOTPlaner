@@ -1,11 +1,12 @@
 ﻿using GOTPlaner.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
 namespace GOTPlaner.Data
 {
-    public class GotContext : DbContext
+    public class GotContext : IdentityDbContext
     {
         public GotContext(DbContextOptions<GotContext> options) : base(options)
         {
@@ -19,6 +20,8 @@ namespace GOTPlaner.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<BadgeType>()
                 .HasIndex(bt => bt.Name)
                 .IsUnique();
@@ -156,7 +159,7 @@ namespace GOTPlaner.Data
                 }));
 
             modelBuilder.Entity<Segment>()
-                .HasIndex(s => new { s.TouristPointAId, s.TouristPointBId})
+                .HasIndex(s => new { s.TouristPointAId, s.TouristPointBId })
                 .IsUnique();
 
             // data initialization
@@ -164,13 +167,219 @@ namespace GOTPlaner.Data
                 .HasData(
                 new Tourist
                 {
-                    Email = "jkowalski1@gmail.com",
+                    Email = "tourist@localhost",
                     FirstName = "Jan",
                     LastName = "Kowalski",
                     BirthDate = DateTime.Parse("1998-01-01"),
-                    Password = "plain",
+                    Password = "Tourist1",
                     Disability = false
                 });
+
+            modelBuilder.Entity<Leader>()
+                .HasData(
+                new Leader
+                {
+                    Email = "leader@localhost",
+                    FirstName = "Michał",
+                    LastName = "Głuś",
+                    BirthDate = DateTime.Parse("1978-01-01"),
+                    Password = "Leader12",
+                    Disability = false,
+                    IDCard = 112
+                },
+                new Leader
+                {
+                    Email = "leader2@localhost",
+                    FirstName = "Kamil",
+                    LastName = "Zdun",
+                    BirthDate = DateTime.Parse("1978-01-01"),
+                    Password = "Leader12",
+                    Disability = false,
+                    IDCard = 997
+                });
+
+            modelBuilder.Entity<TouristPoint>()
+                .HasData(
+                new TouristPoint
+                {
+                    ID = 1,
+                    Name = "Dyszowa",
+                    MountainRangeId = MountainRangeId.Bieszczady,
+                    ElementTypeId = ElementTypeId.SystemType,
+                },
+                new TouristPoint
+                {
+                    ID = 2,
+                    Name = "Prełuki",
+                    MountainRangeId = MountainRangeId.Bieszczady,
+                    ElementTypeId = ElementTypeId.SystemType,
+                },
+                new TouristPoint
+                {
+                    ID = 3,
+                    Name = "Mików",
+                    MountainRangeId = MountainRangeId.Bieszczady,
+                    ElementTypeId = ElementTypeId.SystemType,
+                },
+                new TouristPoint
+                {
+                    ID = 4,
+                    Name = "Jaworne",
+                    MountainRangeId = MountainRangeId.Bieszczady,
+                    ElementTypeId = ElementTypeId.SystemType,
+                },
+                new TouristPoint
+                {
+                    ID = 5,
+                    Name = "Rabia Skała",
+                    MountainRangeId = MountainRangeId.Bieszczady,
+                    ElementTypeId = ElementTypeId.SystemType,
+                },
+                new TouristPoint
+                {
+                    ID = 6,
+                    Name = "Chmiel",
+                    MountainRangeId = MountainRangeId.Bieszczady,
+                    ElementTypeId = ElementTypeId.SystemType,
+                }
+                );
+
+            modelBuilder.Entity<Segment>()
+                .HasData(
+                new Segment
+                {
+                    ID = 1,
+                    TouristPointAId = 1,
+                    TouristPointBId = 2,
+                    PointsAB = 7,
+                    PointsBA = 8,
+                    LevelDifferenceSum = 435,
+                    NumberOfKilometers = 4.1,
+                    ElementTypeId = ElementTypeId.SystemType
+                },
+                new Segment
+                {
+                    ID = 2,
+                    TouristPointAId = 2,
+                    TouristPointBId = 3,
+                    PointsAB = 5,
+                    LevelDifferenceSum = 212,
+                    NumberOfKilometers = 2.4,
+                    ElementTypeId = ElementTypeId.SystemType
+                },
+                new Segment
+                {
+                    ID = 3,
+                    TouristPointAId = 3,
+                    TouristPointBId = 4,
+                    PointsAB = 5,
+                    PointsBA = 4,
+                    LevelDifferenceSum = 56,
+                    NumberOfKilometers = 3.1,
+                    ElementTypeId = ElementTypeId.SystemType
+                },
+                new Segment
+                {
+                    ID = 4,
+                    TouristPointAId = 4,
+                    TouristPointBId = 5,
+                    PointsAB = 1,
+                    PointsBA = 1,
+                    LevelDifferenceSum = 24,
+                    NumberOfKilometers = 1.6,
+                    ElementTypeId = ElementTypeId.SystemType
+                },
+                new Segment
+                {
+                    ID = 5,
+                    TouristPointAId = 2,
+                    TouristPointBId = 6,
+                    PointsAB = 8,
+                    PointsBA = 8,
+                    LevelDifferenceSum = 111,
+                    NumberOfKilometers = 6.0,
+                    ElementTypeId = ElementTypeId.SystemType
+                },
+                new Segment
+                {
+                    ID = 6,
+                    TouristPointAId = 6,
+                    TouristPointBId = 5,
+                    PointsAB = 12,
+                    PointsBA = 11,
+                    LevelDifferenceSum = 256,
+                    NumberOfKilometers = 5.3,
+                    ElementTypeId = ElementTypeId.SystemType
+                }
+                );
+
+            modelBuilder.Entity<Tour>()
+                .HasData(
+                new Tour
+                {
+                    ID = 1,
+                    CreationDate = DateTime.Now.AddMonths(-3).Date,
+                    StartDate = DateTime.Now.AddDays(-85).AddHours(-2).AddMinutes(13),
+                    EndDate = DateTime.Now.AddDays(-85).AddHours(3),
+                    BadgeTypeId = BadgeTypeId.Popularna,
+                    TouristEmail = "tourist@localhost"
+                }
+                );
+
+            modelBuilder.Entity<SegmentCross>()
+                .HasData(
+                new SegmentCross
+                {
+                    ID = 1,
+                    TourId = 1,
+                    SegmentId = 1,
+                    Order = 1,
+                    CrossDate = DateTime.Now.AddDays(-85).AddHours(-1),
+                    Direction = true,
+                    ImageName = "preluki.jpg"
+                },
+                new SegmentCross
+                {
+                    ID = 2,
+                    TourId = 1,
+                    SegmentId = 2,
+                    Order = 2,
+                    CrossDate = DateTime.Now.AddDays(-85).AddMinutes(12),
+                    Direction = true,
+                    ImageName = "mikow.jpg"
+                },
+                new SegmentCross
+                {
+                    ID = 3,
+                    TourId = 1,
+                    SegmentId = 3,
+                    Order = 3,
+                    CrossDate = DateTime.Now.AddDays(-85).AddHours(1).AddMinutes(21),
+                    Direction = true,
+                    ImageName = "jaworne.jpg"
+                },
+                new SegmentCross
+                {
+                    ID = 4,
+                    TourId = 1,
+                    SegmentId = 4,
+                    Order = 4,
+                    CrossDate = DateTime.Now.AddDays(-85).AddHours(3),
+                    Direction = true,
+                    ImageName = "rabia.jpg"
+                }
+                );
+
+            modelBuilder.Entity<TourVerification>()
+                .HasData(
+                new TourVerification
+                {
+                    ID = 1,
+                    TourId = 1,
+                    LeaderEmail = null,
+                    TourVerificationStatusId = TourVerificationStatusId.Zgloszona
+                }
+                );
         }
 
         // entities

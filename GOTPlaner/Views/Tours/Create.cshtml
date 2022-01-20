@@ -6,29 +6,24 @@
 
 <h1>Create</h1>
 
-<h4>Tour</h4>
+<h4>Budowanie planu wycieczki</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="CreationDate" class="control-label"></label>
-                <input asp-for="CreationDate" class="form-control" />
-                <span asp-validation-for="CreationDate" class="text-danger"></span>
+                <label class="control-label"></label>
+                <input placeholder="Punkt początkowy" id="input1" class="form-control" />
+                <span class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" />
-                <span asp-validation-for="EndDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <button disabled="disabled" type="button" id="addPoint" class="btn btn-disabled">
+                  Dodaj kolejny punkt
+                </button>
+                <button disabled="disabled" type="submit" id="addTour" class="btn btn-disabled">
+					Utwórz plan wycieczki
+				</button>
             </div>
         </form>
     </div>
@@ -40,4 +35,267 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        "use strict";
+
+$.ajaxSetup({
+    async: false
+});
+
+function getAllTouristPoints() {
+    var json;
+    $.getJSON('https://localhost:5001/api/TouristPoints', function (data) {
+        console.log(data);
+        json = data;
+    })
+    return json;
+}
+
+let allTouristPoints = getAllTouristPoints();
+
+let autocomplete = (inp, arr) => {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  let currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+    let a, //OUTER html: variable for listed content with html-content
+      b, // INNER html: filled with array-Data and html
+      i, //Counter
+      val = this.value;
+
+    /*close any already open lists of autocompleted values*/
+    closeAllLists();
+
+    if (!val) {
+      return false;
+    }
+
+    currentFocus = -1;
+
+    /*create a DIV element that will contain the items (values):*/
+    a = document.createElement("DIV");
+    
+    a.setAttribute("id", this.id + "autocomplete-list");
+    a.setAttribute("class", "autocomplete-items list-group text-left");
+    
+    /*append the DIV element as a child of the autocomplete container:*/
+    this.parentNode.appendChild(a);
+
+    /*for each item in the array...*/
+    for (i = 0; i < arr.length; i++) {
+      /*check if the item starts with the same letters as the text field value:*/
+      if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+        /*create a DIV element for each matching element:*/
+        b = document.createElement("DIV");
+        b.setAttribute("class","list-group-item list-group-item-action");
+        /*make the matching letters bold:*/
+        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+        b.innerHTML += arr[i].substr(val.length);
+        /*insert a input field that will hold the current array item's value:*/
+        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+        /*execute a function when someone clicks on the item value (DIV element):*/
+        b.addEventListener("click", function(e) {
+          /*insert the value for the autocomplete text field:*/
+          inp.value = this.getElementsByTagName("input")[0].value;
+          /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+          closeAllLists();
+        });
+        a.appendChild(b);
+      }
+    }
+  });
+  
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+    var x = document.getElementById(this.id + "autocomplete-list");
+    if (x) x = x.getElementsByTagName("div");
+    if (e.keyCode == 40) {
+      /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+      currentFocus++;
+      /*and and make the current item more visible:*/
+      addActive(x);
+    } else if (e.keyCode == 38) {
+      //up
+      /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+      currentFocus--;
+      /*and and make the current item more visible:*/
+      addActive(x);
+    } else if (e.keyCode == 13) {
+      /*If the ENTER key is pressed, prevent the form from being submitted,*/
+      e.preventDefault();
+      if (currentFocus > -1) {
+        /*and simulate a click on the "active" item:*/
+        if (x) x[currentFocus].click();
+      }
+    }
+  });
+  
+  let addActive = (x) => {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = x.length - 1;
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("active");
+  }
+  
+  let removeActive = (x) => {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (let i = 0; i < x.length; i++) {
+      x[i].classList.remove("active");
+    }
+  }
+  
+  let closeAllLists = (elmnt) => {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+  
+  /*execute a function when someone clicks in the document:*/
+  document.addEventListener("click", function(e) {
+    closeAllLists(e.target);
+  });
+  
+};
+
+var state = 0;
+var previousInput = document.getElementById("input1");
+let lastInput = document.getElementById("input1");
+let lastElement = document.getElementById("input1");
+let createAnotherPointButton = document.getElementById("addPoint");
+let createTourButton = document.getElementById("addTour");
+let checkbox;
+let currentlyAvailablePoints = [{"point" : "Prełuki", "points" : 0}, {"point" : "Dadada", "points" : 0}, {"point" : "Bebebe", "points" : 0}]
+var currentIndex = 0;
+
+lastInput.addEventListener('input', changeState);
+createAnotherPointButton.addEventListener('click', addNewInput);
+
+initialize(lastInput);
+
+function initialize(input) {
+	let data = getAllTouristPoints();
+    console.log(data);
+	autocomplete(input, data);
+}
+
+function extractNumberFromString(value) {
+	return value.match(/[0-9]+/g);
+}
+
+function changeState(e) {
+		if (e.target.value.length != 0) {
+			createAnotherPointButton.removeAttribute("disabled");
+			createAnotherPointButton.setAttribute("enabled", "enabled");
+			createAnotherPointButton.removeAttribute("class");
+			createAnotherPointButton.setAttribute("class", "btn btn-primary");
+			if (currentIndex > 0) {
+				createTourButton.removeAttribute("disabled");
+				createTourButton.setAttribute("enabled", "enabled");
+				createTourButton.removeAttribute("class");
+				createTourButton.setAttribute("class", "btn btn-success");
+			}
+		}
+		else {
+			createAnotherPointButton.removeAttribute("enabled");
+			createAnotherPointButton.setAttribute("disabled", "disabled");
+			createAnotherPointButton.removeAttribute("class");
+			createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+			if (currentIndex > 0) {
+				createTourButton.removeAttribute("enabled");
+				createTourButton.setAttribute("disabled", "disabled");
+				createTourButton.removeAttribute("class");
+				createTourButton.setAttribute("class", "btn btn-disabled");
+			}
+		}
+}
+
+function addNewInput() {
+	var newInput = document.createElement("input");
+	newInput.type = "text";
+	newInput.id = "input" + (++currentIndex);
+	newInput.placeholder = "Kolejny punkt";
+	newInput.setAttribute("class", "Form-control");
+	insertAfter(newInput, lastElement);
+	lastInput.removeEventListener('change', changeState);
+	lastInput.setAttribute("disabled", "disabled");
+	lastInput = newInput;
+	lastElement = lastInput;
+	newInput.addEventListener('input', changeState);
+	initialize(newInput);
+
+	let ownPointCheckbox = document.createElement("input");
+	ownPointCheckbox.type = "checkbox";
+	ownPointCheckbox.id = "ownPointCheckbox" + currentIndex;
+	ownPointCheckbox.setAttribute("onclick", "showOwnPointInputs(this)");
+	let ownPointCheckboxLabel = document.createElement("label");
+	ownPointCheckboxLabel.setAttribute("for", ownPointCheckbox.getAttribute("id"));
+	ownPointCheckboxLabel.textContent = "Własny punkt: ";
+	insertAfter(ownPointCheckboxLabel, lastElement);
+	lastElement = ownPointCheckboxLabel;
+	insertAfter(ownPointCheckbox, lastElement);
+	lastElement = ownPointCheckbox;
+
+	createAnotherPointButton.removeAttribute("enabled");
+	createAnotherPointButton.setAttribute("disabled", "disabled");
+	createAnotherPointButton.removeAttribute("class");
+	createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+
+	createTourButton.removeAttribute("enabled");
+	createTourButton.setAttribute("disabled", "disabled");
+	createTourButton.removeAttribute("class");
+	createTourButton.setAttribute("class", "btn btn-disabled");
+
+	currentIndex++;
+}
+
+function showOwnPointInputs(checkbox) {
+	if (checkbox.checked) {
+		let mountainRangeSelect = document.createElement("select");
+		mountainRangeSelect.id = "mountainRange" + currentIndex;
+		let numberOfKilometersInput = document.createElement("input");
+		numberOfKilometersInput.type = "number";
+		numberOfKilometersInput.id = "numberOfKilometers" + currentIndex;
+		let levelDifferenceInput = document.createElement("input");
+		levelDifferenceInput.type = "number";
+		levelDifferenceInput.id = "levelDifferenceInput" + currentIndex;
+
+		insertAfter(mountainRangeSelect, checkbox);
+		insertAfter(numberOfKilometersInput, mountainRangeSelect);
+		insertAfter(levelDifferenceInput, numberOfKilometersInput);
+
+		lastElement = levelDifferenceInput;
+	}
+	else {
+		let mountainRangeSelect = document.getElementById("mountainRange" + currentIndex);
+		mountainRangeSelect.remove();
+		let numberOfKilometersInput = document.getElementById("numberOfKilometers" + currentIndex);
+		numberOfKilometersInput.remove();
+		let levelDifferenceInput = document.getElementById("levelDifferenceInput" + currentIndex);
+		levelDifferenceInput.remove();
+		lastElement = checkbox;
+	}
+}
+
+function validateCurrentInputValue() {
+	
+}
+
+function insertAfter(newNode, referenceNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+    </script>
+
 }

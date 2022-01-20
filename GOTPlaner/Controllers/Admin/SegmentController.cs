@@ -23,7 +23,7 @@ namespace GOTPlaner.Controllers.Admin
         // GET: Segment
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Segments.ToListAsync());
+            return View(await _context.Segments.Include(e => e.TouristPointA).Include(e => e.TouristPointB).ToListAsync());
         }
 
         // GET: Segment/Details/5
@@ -63,6 +63,10 @@ namespace GOTPlaner.Controllers.Admin
         {
             if (ModelState.IsValid)
             {
+                if (!ValidateSegments(createSegmentViewModel))
+                {
+                    return View(createSegmentViewModel);
+                }
                 TouristPoint touristPointA = _context.TouristPoints.Where(e => e.Name.Equals(createSegmentViewModel.PointA) && e.MountainRange.MountainRangeId == createSegmentViewModel.MountainRangeAId).FirstOrDefault();
                 TouristPoint touristPointB = _context.TouristPoints.Where(e => e.Name.Equals(createSegmentViewModel.PointB) && e.MountainRange.MountainRangeId == createSegmentViewModel.MountainRangeBId).FirstOrDefault();
                 ElementType elementType = _context.ElementTypes.Where(e => e.ElementTypeId == ElementTypeId.SystemType).First();
@@ -79,7 +83,6 @@ namespace GOTPlaner.Controllers.Admin
                         ElementType = elementType,
                         ElementTypeId = elementTypeId
                     };
-                    _context.Add(touristPointA);
                     touristPointB = new TouristPoint
                     {
                         Name = createSegmentViewModel.PointB,
@@ -88,6 +91,7 @@ namespace GOTPlaner.Controllers.Admin
                         ElementType = elementType,
                         ElementTypeId = elementTypeId
                     };
+                    _context.Add(touristPointA);
                     _context.Add(touristPointB);
                 }
                 else if (touristPointA == null)
@@ -114,18 +118,6 @@ namespace GOTPlaner.Controllers.Admin
                     };
                     _context.Add(touristPointB);
                 }
-                else
-                {
-                    var segm = _context.Segments.Where(
-                        s => (s.TouristPointA.Name.Equals(createSegmentViewModel.PointA) && s.TouristPointB.Name.Equals(createSegmentViewModel.PointB)) ||
-                              s.TouristPointB.Name.Equals(createSegmentViewModel.PointA) && s.TouristPointA.Name.Equals(createSegmentViewModel.PointB)).FirstOrDefault();
-                    if (segm != null)
-                    {
-                        createSegmentViewModel.IsSegmentAlreadyInASystem = true;
-                        createSegmentViewModel.MountainRanges = _context.MountainRanges.ToList();
-                        return View(createSegmentViewModel);
-                    }
-                }
                 var segment = new Segment
                 {
                     TouristPointA = touristPointA,
@@ -146,6 +138,36 @@ namespace GOTPlaner.Controllers.Admin
             return View(createSegmentViewModel);
         }
 
+        private bool ValidateSegments(CreateSegmentViewModel viewModel)
+        {
+            var touristPointA = new TouristPoint
+            {
+                Name = viewModel.PointA,
+                MountainRangeId = viewModel.MountainRangeAId,
+            };
+            var touristPointB = new TouristPoint
+            {
+                Name = viewModel.PointB,
+                MountainRangeId = viewModel.MountainRangeBId,
+
+            };
+            if (touristPointA.Equals(touristPointB))
+            {
+                viewModel.AreTouristPointsTheSame = true;
+                
+            }
+            var segm = _context.Segments.Where(
+                        s => (s.TouristPointA.Name.Equals(viewModel.PointA) && s.TouristPointA.MountainRangeId == viewModel.MountainRangeAId
+                        && s.TouristPointB.Name.Equals(viewModel.PointB) && s.TouristPointB.MountainRangeId == viewModel.MountainRangeBId) ||
+                              s.TouristPointB.Name.Equals(viewModel.PointA) && s.TouristPointB.MountainRangeId == viewModel.MountainRangeAId
+                        && s.TouristPointA.Name.Equals(viewModel.PointB) && s.TouristPointA.MountainRangeId == s.TouristPointA.MountainRangeId).FirstOrDefault();
+            if (segm != null)
+            {
+                viewModel.IsSegmentAlreadyInASystem = true;
+            }
+            viewModel.MountainRanges = _context.MountainRanges.ToList();
+            return !viewModel.AreTouristPointsTheSame && !viewModel.IsSegmentAlreadyInASystem;
+        }
         // GET: Segment/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

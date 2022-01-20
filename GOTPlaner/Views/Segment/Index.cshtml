@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<GOTPlaner.Models.Segment>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Odcinki";
 }
 
 <h1>Odcinki</h1>
@@ -13,23 +13,34 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.PointsAB)
+                Punkt A
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PointsBA)
+                PunktB
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LevelDifferenceSum)
+                Punkty AB
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NumberOfKilometers)
+                Punkty BA
             </th>
-            <th></th>
+            <th>
+                Liczba kilometrów
+            </th>
+            <th>
+                Suma różnic poziomów
+            </th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TouristPointA.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TouristPointB.Name)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PointsAB)
             </td>
@@ -43,9 +54,9 @@
                 @Html.DisplayFor(modelItem => item.NumberOfKilometers)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.ID">Edytuj</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Szczegóły</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Usuń</a>
             </td>
         </tr>
 }
