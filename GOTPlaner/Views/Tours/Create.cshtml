@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-controller="Tours" asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label class="control-label"></label>
@@ -42,16 +42,49 @@ $.ajaxSetup({
     async: false
 });
 
+let currentPointsIds = {};
+let currentPointsPointAdvantage = [];
+let currentPointsMountainRangeIds = [];
+let currentPointsMountainRangeNames = [];
+let currentPointsNames = [];
+
 function getAllTouristPoints() {
     var json;
     $.getJSON('https://localhost:5001/api/TouristPoints', function (data) {
         console.log(data);
         json = data;
-    })
-    return json;
+    });
+    console.log(json);
+    for (let i = 0; i < json.length; i++) {
+        currentPointsIds[json[i].apiName] = json[i].id;
+        currentPointsMountainRangeIds[json[i].apiName] = json[i].mountainRangeId;
+    }
+    console.log(currentPointsIds);
+    console.log(currentPointsMountainRangeIds);
+    return json.map(function(pointDto) {
+        return pointDto.apiName;
+    });
 }
 
-let allTouristPoints = getAllTouristPoints();
+function getAllTouristPointsPossibleFromSpecificTouristPoint(touristPoint) {
+    let json;
+    $.getJSON('https://localhost:5001/api/TouristPointsPossibleFromPoint?pointId=' + currentPointsIds[currentPointsIds[touristPoint.value]], function (data) {
+        console.log(data);
+        json = data;
+    });
+    currentPointsIds = {};
+    currentPointsMountainRangeIds = {};
+    currentPointsPointAdvantage = {};
+    for (let i = 0; i < json.length; i++) {
+        currentPointsIds[json[i].touristPointDto.apiName] = json[i].touristPointDto.id;
+        currentPointsMountainRangeIds[json[i].touristPointDto.apiName] = json[i].touristPointDto.mountainRangeId;
+        currentPointsPointAdvantage[json[i].touristPointDto.apiName] = json[i].pointsToGain;
+    }
+    console.log(currentPointIds);
+    console.log(currentPointMountainRangeIds);
+    console.log(currentPointsPointAdvantage);
+    return json;
+}
 
 let autocomplete = (inp, arr) => {
   /*the autocomplete function takes two arguments,
@@ -172,6 +205,7 @@ let autocomplete = (inp, arr) => {
 
 var state = 0;
 var previousInput = document.getElementById("input1");
+let previousInputValue = "";
 let lastInput = document.getElementById("input1");
 let lastElement = document.getElementById("input1");
 let createAnotherPointButton = document.getElementById("addPoint");
@@ -186,7 +220,7 @@ createAnotherPointButton.addEventListener('click', addNewInput);
 initialize(lastInput);
 
 function initialize(input) {
-	let data = getAllTouristPoints();
+	let data = currentIndex == 0 ? getAllTouristPoints() : getAllTouristPointsPossibleFromSpecificTouristPoint(previousInputValue);
     console.log(data);
 	autocomplete(input, data);
 }
@@ -223,6 +257,7 @@ function changeState(e) {
 }
 
 function addNewInput() {
+    previousInputValue = lastInput.value;
 	var newInput = document.createElement("input");
 	newInput.type = "text";
 	newInput.id = "input" + (++currentIndex);
