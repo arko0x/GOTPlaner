@@ -92,7 +92,8 @@ namespace GOTPlaner.Controllers.API
                                 {
                                     ID = touristPoint.ID,
                                     Name = touristPoint.Name,
-                                    MountainRangeId = touristPoint.MountainRangeId
+                                    MountainRangeId = touristPoint.MountainRangeId,
+                                    APIName = touristPoint.Name + " | " + _context.MountainRanges.Where(mr => mr.MountainRangeId == touristPoint.MountainRangeId).FirstOrDefault().Name
                                 },
                                 PointsToGain = segment.PointsBA.Value
                             });

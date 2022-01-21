@@ -16,6 +16,8 @@
                 <label class="control-label"></label>
                 <input placeholder="Punkt początkowy" id="input1" class="form-control" />
                 <span class="text-danger"></span>
+                <label for="ownPointCheckbox1">Własny punkt: </label>
+                <input type="checkbox" id="ownPointCheckbox1" onclick="showOwnPointInputs(this)"/>
             </div>
             <div class="form-group">
                 <button disabled="disabled" type="button" id="addPoint" class="btn btn-disabled">
@@ -42,33 +44,40 @@ $.ajaxSetup({
     async: false
 });
 
+function getAllMountainRanges() {
+    let json;
+    $.getJSON('https://localhost:5001/api/MountainRanges', function(data) {
+        json = data;
+    });
+
+    return json;
+}
+let allMountainRanges = getAllMountainRanges();
+
+
 let currentPointsIds = {};
-let currentPointsPointAdvantage = [];
-let currentPointsMountainRangeIds = [];
-let currentPointsMountainRangeNames = [];
-let currentPointsNames = [];
+let currentPointsPointAdvantage = {};
+let currentPointsMountainRangeIds = {};
+let currentPointsMountainRangeNames = {};
+let currentPointsNames = {};
 
 function getAllTouristPoints() {
     var json;
     $.getJSON('https://localhost:5001/api/TouristPoints', function (data) {
-        console.log(data);
         json = data;
     });
-    console.log(json);
     for (let i = 0; i < json.length; i++) {
         currentPointsIds[json[i].apiName] = json[i].id;
         currentPointsMountainRangeIds[json[i].apiName] = json[i].mountainRangeId;
     }
-    console.log(currentPointsIds);
-    console.log(currentPointsMountainRangeIds);
     return json.map(function(pointDto) {
         return pointDto.apiName;
     });
 }
 
-function getAllTouristPointsPossibleFromSpecificTouristPoint(touristPoint) {
+function getAllTouristPointsPossibleFromSpecificTouristPoint(id) {
     let json;
-    $.getJSON('https://localhost:5001/api/TouristPointsPossibleFromPoint?pointId=' + currentPointsIds[currentPointsIds[touristPoint.value]], function (data) {
+    $.getJSON('https://localhost:5001/api/TouristPointsPossibleFromPoint?pointId=' + id, function (data) {
         console.log(data);
         json = data;
     });
@@ -76,14 +85,13 @@ function getAllTouristPointsPossibleFromSpecificTouristPoint(touristPoint) {
     currentPointsMountainRangeIds = {};
     currentPointsPointAdvantage = {};
     for (let i = 0; i < json.length; i++) {
-        currentPointsIds[json[i].touristPointDto.apiName] = json[i].touristPointDto.id;
-        currentPointsMountainRangeIds[json[i].touristPointDto.apiName] = json[i].touristPointDto.mountainRangeId;
-        currentPointsPointAdvantage[json[i].touristPointDto.apiName] = json[i].pointsToGain;
+        currentPointsIds[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].touristPointDto.id;
+        currentPointsMountainRangeIds[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].touristPointDto.mountainRangeId;
+        currentPointsPointAdvantage[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].pointsToGain;
     }
-    console.log(currentPointIds);
-    console.log(currentPointMountainRangeIds);
-    console.log(currentPointsPointAdvantage);
-    return json;
+    return json.map(function(pointInfo) {
+        return pointInfo.touristPointDto.apiName + " | " + pointInfo.pointsToGain;
+    });
 }
 
 let autocomplete = (inp, arr) => {
@@ -113,7 +121,10 @@ let autocomplete = (inp, arr) => {
     a.setAttribute("class", "autocomplete-items list-group text-left");
     
     /*append the DIV element as a child of the autocomplete container:*/
-    this.parentNode.appendChild(a);
+    console.log(inp);
+    insertAfter(a, inp);
+    //this.parentNode.appendChild(a);
+    //lastElement = a;
 
     /*for each item in the array...*/
     for (i = 0; i < arr.length; i++) {
@@ -207,12 +218,15 @@ var state = 0;
 var previousInput = document.getElementById("input1");
 let previousInputValue = "";
 let lastInput = document.getElementById("input1");
-let lastElement = document.getElementById("input1");
+let lastElement = document.getElementById("ownPointCheckbox1");
 let createAnotherPointButton = document.getElementById("addPoint");
 let createTourButton = document.getElementById("addTour");
-let checkbox;
+let numberOfPointsInfo;
+let checkboxOwn;
 let currentlyAvailablePoints = [{"point" : "Prełuki", "points" : 0}, {"point" : "Dadada", "points" : 0}, {"point" : "Bebebe", "points" : 0}]
 var currentIndex = 0;
+let ownPoint = false;
+let isLastPointOwn = false;
 
 lastInput.addEventListener('input', changeState);
 createAnotherPointButton.addEventListener('click', addNewInput);
@@ -220,7 +234,7 @@ createAnotherPointButton.addEventListener('click', addNewInput);
 initialize(lastInput);
 
 function initialize(input) {
-	let data = currentIndex == 0 ? getAllTouristPoints() : getAllTouristPointsPossibleFromSpecificTouristPoint(previousInputValue);
+	let data = currentIndex == 0 || isLastPointOwn ? getAllTouristPoints() : getAllTouristPointsPossibleFromSpecificTouristPoint(previousInputValue);
     console.log(data);
 	autocomplete(input, data);
 }
@@ -257,19 +271,27 @@ function changeState(e) {
 }
 
 function addNewInput() {
-    previousInputValue = lastInput.value;
+    previousInputValue = currentPointsIds[lastInput.value];
 	var newInput = document.createElement("input");
 	newInput.type = "text";
 	newInput.id = "input" + (++currentIndex);
 	newInput.placeholder = "Kolejny punkt";
-	newInput.setAttribute("class", "Form-control");
+	newInput.setAttribute("class", "form-control");
 	insertAfter(newInput, lastElement);
 	lastInput.removeEventListener('change', changeState);
 	lastInput.setAttribute("disabled", "disabled");
 	lastInput = newInput;
 	lastElement = lastInput;
 	newInput.addEventListener('input', changeState);
+    console.log("previousInputValueBeforeInitialize: " + previousInputValue);
 	initialize(newInput);
+    console.log("previousInputValueAfterInitialize: " + previousInputValue);
+
+    console.log("checkboxOwn");
+    console.log(checkboxOwn);
+    if (checkboxOwn != undefined) {
+        isLastPointOwn = checkboxOwn.checked || checkboxOwn.hasAttribute("disabled") ? true : false;
+    }
 
 	let ownPointCheckbox = document.createElement("input");
 	ownPointCheckbox.type = "checkbox";
@@ -278,6 +300,10 @@ function addNewInput() {
 	let ownPointCheckboxLabel = document.createElement("label");
 	ownPointCheckboxLabel.setAttribute("for", ownPointCheckbox.getAttribute("id"));
 	ownPointCheckboxLabel.textContent = "Własny punkt: ";
+    if (isLastPointOwn) {
+        ownPointCheckboxLabel.setAttribute("disabled", "disabled");
+    }
+    checkboxOwn = ownPointCheckboxLabel;
 	insertAfter(ownPointCheckboxLabel, lastElement);
 	lastElement = ownPointCheckboxLabel;
 	insertAfter(ownPointCheckbox, lastElement);
@@ -297,15 +323,26 @@ function addNewInput() {
 }
 
 function showOwnPointInputs(checkbox) {
-	if (checkbox.checked) {
+	if (checkbox.checked || isLastPointOwn) {
+        ownPoint = true;
 		let mountainRangeSelect = document.createElement("select");
 		mountainRangeSelect.id = "mountainRange" + currentIndex;
+        for (const val of allMountainRanges) {
+            let option = document.createElement("option");
+            option.value = val.mountainRangeId;
+            option.text = val.name;
+            mountainRangeSelect.appendChild(option);
+        }
 		let numberOfKilometersInput = document.createElement("input");
-		numberOfKilometersInput.type = "number";
+		numberOfKilometersInput.type = "text";
+        numberOfKilometersInput.pattern = "[0-9]+"
 		numberOfKilometersInput.id = "numberOfKilometers" + currentIndex;
+        numberOfKilometersInput.placeholder = "Liczba kilometrów";
 		let levelDifferenceInput = document.createElement("input");
 		levelDifferenceInput.type = "number";
 		levelDifferenceInput.id = "levelDifferenceInput" + currentIndex;
+        levelDifferenceInput.pattern = "[0-9]+";
+        levelDifferenceInput.placeholder = "Suma różnic poziomów";
 
 		insertAfter(mountainRangeSelect, checkbox);
 		insertAfter(numberOfKilometersInput, mountainRangeSelect);
@@ -314,6 +351,7 @@ function showOwnPointInputs(checkbox) {
 		lastElement = levelDifferenceInput;
 	}
 	else {
+        ownPoint = false;
 		let mountainRangeSelect = document.getElementById("mountainRange" + currentIndex);
 		mountainRangeSelect.remove();
 		let numberOfKilometersInput = document.getElementById("numberOfKilometers" + currentIndex);
