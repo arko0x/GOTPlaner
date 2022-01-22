@@ -7,7 +7,7 @@ namespace GOTPlaner.Models
     {
         public override string FormatErrorMessage(string name)
         {
-            return "You have to be at leasst 7 years old to register";
+            return "You have to be at least 7 years old to register";
         }
 
         protected override ValidationResult IsValid(object objValue, ValidationContext validationContext)
