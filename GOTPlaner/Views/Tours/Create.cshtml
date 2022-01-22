@@ -23,7 +23,7 @@
                 <button disabled="disabled" type="button" id="addPoint" class="btn btn-disabled">
                   Dodaj kolejny punkt
                 </button>
-                <button disabled="disabled" type="submit" id="addTour" class="btn btn-disabled">
+                <button disabled="disabled" type="button" onclick="sendFormDataToServer()" id="addTour" class="btn btn-disabled">
 					Utwórz plan wycieczki
 				</button>
             </div>
@@ -44,6 +44,8 @@ $.ajaxSetup({
     async: false
 });
 
+let formData = [];
+
 function getAllMountainRanges() {
     let json;
     $.getJSON('https://localhost:5001/api/MountainRanges', function(data) {
@@ -59,7 +61,7 @@ let currentPointsIds = {};
 let currentPointsPointAdvantage = {};
 let currentPointsMountainRangeIds = {};
 let currentPointsMountainRangeNames = {};
-let currentPointsNames = {};
+let currentPointsNames = [];
 
 function getAllTouristPoints() {
     var json;
@@ -69,6 +71,7 @@ function getAllTouristPoints() {
     for (let i = 0; i < json.length; i++) {
         currentPointsIds[json[i].apiName] = json[i].id;
         currentPointsMountainRangeIds[json[i].apiName] = json[i].mountainRangeId;
+        currentPointsNames[i] = json[i].apiName;
     }
     return json.map(function(pointDto) {
         return pointDto.apiName;
@@ -84,10 +87,12 @@ function getAllTouristPointsPossibleFromSpecificTouristPoint(id) {
     currentPointsIds = {};
     currentPointsMountainRangeIds = {};
     currentPointsPointAdvantage = {};
+    currentPointsNames = [];
     for (let i = 0; i < json.length; i++) {
         currentPointsIds[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].touristPointDto.id;
         currentPointsMountainRangeIds[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].touristPointDto.mountainRangeId;
         currentPointsPointAdvantage[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].pointsToGain;
+        currentPointsNames[i] = json[i].touristPointDto.apiName + " | " + json[i].pointsToGain;
     }
     return json.map(function(pointInfo) {
         return pointInfo.touristPointDto.apiName + " | " + pointInfo.pointsToGain;
@@ -142,6 +147,7 @@ let autocomplete = (inp, arr) => {
         b.addEventListener("click", function(e) {
           /*insert the value for the autocomplete text field:*/
           inp.value = this.getElementsByTagName("input")[0].value;
+          inp.dispatchEvent(new Event('input'));
           /*close the list of autocompleted values,
               (or any other open lists of autocompleted values:*/
           closeAllLists();
@@ -222,10 +228,14 @@ let lastElement = document.getElementById("ownPointCheckbox1");
 let createAnotherPointButton = document.getElementById("addPoint");
 let createTourButton = document.getElementById("addTour");
 let numberOfPointsInfo;
-let checkboxOwn;
+let checkboxOwn = document.getElementById("ownPointCheckbox1");
+let mountainRangeSelect;
+let numberOfKilometersInput;
+let levelDifferenceInput;
 let currentlyAvailablePoints = [{"point" : "Prełuki", "points" : 0}, {"point" : "Dadada", "points" : 0}, {"point" : "Bebebe", "points" : 0}]
 var currentIndex = 0;
 let ownPoint = false;
+let forcedKilometersInput = false;
 let isLastPointOwn = false;
 
 lastInput.addEventListener('input', changeState);
@@ -234,7 +244,7 @@ createAnotherPointButton.addEventListener('click', addNewInput);
 initialize(lastInput);
 
 function initialize(input) {
-	let data = currentIndex == 0 || isLastPointOwn ? getAllTouristPoints() : getAllTouristPointsPossibleFromSpecificTouristPoint(previousInputValue);
+	let data = currentIndex == 0 || input == undefined || isLastPointOwn ? getAllTouristPoints() : getAllTouristPointsPossibleFromSpecificTouristPoint(previousInputValue);
     console.log(data);
 	autocomplete(input, data);
 }
@@ -244,17 +254,35 @@ function extractNumberFromString(value) {
 }
 
 function changeState(e) {
+        console.log(e.target.value);
 		if (e.target.value.length != 0) {
-			createAnotherPointButton.removeAttribute("disabled");
-			createAnotherPointButton.setAttribute("enabled", "enabled");
-			createAnotherPointButton.removeAttribute("class");
-			createAnotherPointButton.setAttribute("class", "btn btn-primary");
-			if (currentIndex > 0) {
-				createTourButton.removeAttribute("disabled");
-				createTourButton.setAttribute("enabled", "enabled");
-				createTourButton.removeAttribute("class");
-				createTourButton.setAttribute("class", "btn btn-success");
-			}
+            if (currentPointsNames.includes(e.target.value)) {
+			    createAnotherPointButton.removeAttribute("disabled");
+			    createAnotherPointButton.setAttribute("enabled", "enabled");
+			    createAnotherPointButton.removeAttribute("class");
+			    createAnotherPointButton.setAttribute("class", "btn btn-primary");
+			    if (currentIndex > 0) {
+				    createTourButton.removeAttribute("disabled");
+				    createTourButton.setAttribute("enabled", "enabled");
+				    createTourButton.removeAttribute("class");
+				    createTourButton.setAttribute("class", "btn btn-success");
+			    }
+                checkboxOwn.removeAttribute("checked");
+                checkboxOwn.setAttribute("disabled", "disabled");
+            }
+            else {
+                createAnotherPointButton.removeAttribute("enabled");
+			    createAnotherPointButton.setAttribute("disabled", "disabled");
+			    createAnotherPointButton.removeAttribute("class");
+			    createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+			    if (currentIndex > 0) {
+				    createTourButton.removeAttribute("enabled");
+				    createTourButton.setAttribute("disabled", "disabled");
+				    createTourButton.removeAttribute("class");
+				    createTourButton.setAttribute("class", "btn btn-disabled");
+			    }
+                checkboxOwn.removeAttribute("disabled");
+            }
 		}
 		else {
 			createAnotherPointButton.removeAttribute("enabled");
@@ -270,7 +298,34 @@ function changeState(e) {
 		}
 }
 
+function addToFormData() {
+    formData[currentIndex] = {
+        touristPointId : currentPointsIds[lastInput.value],
+        touristPointName : lastInput.value,
+        currentPoints : currentPointsPointAdvantage[lastInput.value],
+        ownPoint : checkboxOwn.checked,
+        numberOfKilometers : numberOfKilometersInput != undefined ? numberOfKilometersInput.value : undefined,
+        levelDifference : levelDifferenceInput != undefined ? levelDifferenceInput.value : undefined
+    };
+}
+
+function sendFormDataToServer() {
+    console.log("Send funfction called");
+    $(function() {
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(formData),
+            url: "/api/Tours/Create",
+            contentType: "application/json"
+        });
+    });
+}
+
 function addNewInput() {
+    if (checkboxOwn != undefined) {
+        isLastPointOwn = checkboxOwn.checked ? true : false;
+    }
+    addToFormData();
     previousInputValue = currentPointsIds[lastInput.value];
 	var newInput = document.createElement("input");
 	newInput.type = "text";
@@ -283,15 +338,9 @@ function addNewInput() {
 	lastInput = newInput;
 	lastElement = lastInput;
 	newInput.addEventListener('input', changeState);
-    console.log("previousInputValueBeforeInitialize: " + previousInputValue);
 	initialize(newInput);
-    console.log("previousInputValueAfterInitialize: " + previousInputValue);
 
-    console.log("checkboxOwn");
     console.log(checkboxOwn);
-    if (checkboxOwn != undefined) {
-        isLastPointOwn = checkboxOwn.checked || checkboxOwn.hasAttribute("disabled") ? true : false;
-    }
 
 	let ownPointCheckbox = document.createElement("input");
 	ownPointCheckbox.type = "checkbox";
@@ -301,13 +350,20 @@ function addNewInput() {
 	ownPointCheckboxLabel.setAttribute("for", ownPointCheckbox.getAttribute("id"));
 	ownPointCheckboxLabel.textContent = "Własny punkt: ";
     if (isLastPointOwn) {
-        ownPointCheckboxLabel.setAttribute("disabled", "disabled");
+        forcedKilometersInput = true;
     }
-    checkboxOwn = ownPointCheckboxLabel;
+    else {
+        forcedKilometersInput = false;
+    }
+    checkboxOwn.setAttribute("disabled", "disabled");
+    checkboxOwn = ownPointCheckbox;
 	insertAfter(ownPointCheckboxLabel, lastElement);
 	lastElement = ownPointCheckboxLabel;
 	insertAfter(ownPointCheckbox, lastElement);
 	lastElement = ownPointCheckbox;
+    if (forcedKilometersInput) {
+        showKilometersAndSumDifferenceInputs();
+    }
 
 	createAnotherPointButton.removeAttribute("enabled");
 	createAnotherPointButton.setAttribute("disabled", "disabled");
@@ -319,38 +375,195 @@ function addNewInput() {
 	createTourButton.removeAttribute("class");
 	createTourButton.setAttribute("class", "btn btn-disabled");
 
-	currentIndex++;
+	//currentIndex++;
+}
+
+function showKilometersAndSumDifferenceInputs() {
+    		numberOfKilometersInput = document.createElement("input");
+		    numberOfKilometersInput.type = "text";
+            numberOfKilometersInput.pattern = "[0-9]+"
+		    numberOfKilometersInput.id = "numberOfKilometers" + currentIndex;
+            numberOfKilometersInput.placeholder = "Liczba kilometrów";
+            numberOfKilometersInput.addEventListener('click', function(e) {
+                if (e.target.value.length > 0 && levelDifferenceInput.value.length > 0) {
+                    createAnotherPointButton.removeAttribute("disabled");
+			        createAnotherPointButton.setAttribute("enabled", "enabled");
+			        createAnotherPointButton.removeAttribute("class");
+			        createAnotherPointButton.setAttribute("class", "btn btn-primary");
+			        if (currentIndex > 0) {
+				    createTourButton.removeAttribute("disabled");
+				    createTourButton.setAttribute("enabled", "enabled");
+				    createTourButton.removeAttribute("class");
+				    createTourButton.setAttribute("class", "btn btn-success");
+			        }
+                }
+                else {
+                    createAnotherPointButton.removeAttribute("enabled");
+			        createAnotherPointButton.setAttribute("disabled", "disabled");
+			        createAnotherPointButton.removeAttribute("class");
+			        createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+			        if (currentIndex > 0) {
+				        createTourButton.removeAttribute("enabled");
+				        createTourButton.setAttribute("disabled", "disabled");
+				        createTourButton.removeAttribute("class");
+				        createTourButton.setAttribute("class", "btn btn-disabled");
+			        }
+                }
+            });
+		    levelDifferenceInput = document.createElement("input");
+		    levelDifferenceInput.type = "text";
+		    levelDifferenceInput.id = "levelDifferenceInput" + currentIndex;
+            levelDifferenceInput.pattern = "[0-9]+";
+            levelDifferenceInput.placeholder = "Suma różnic poziomów";
+            levelDifferenceInput.addEventListener('click', function(e) {
+                if (e.target.value.length > 0 && numberOfKilometersInput.value.length > 0) {
+                    createAnotherPointButton.removeAttribute("disabled");
+			        createAnotherPointButton.setAttribute("enabled", "enabled");
+			        createAnotherPointButton.removeAttribute("class");
+			        createAnotherPointButton.setAttribute("class", "btn btn-primary");
+			        if (currentIndex > 0) {
+				    createTourButton.removeAttribute("disabled");
+				    createTourButton.setAttribute("enabled", "enabled");
+				    createTourButton.removeAttribute("class");
+				    createTourButton.setAttribute("class", "btn btn-success");
+			        }
+                }
+                else {
+                    createAnotherPointButton.removeAttribute("enabled");
+			        createAnotherPointButton.setAttribute("disabled", "disabled");
+			        createAnotherPointButton.removeAttribute("class");
+			        createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+			        if (currentIndex > 0) {
+				        createTourButton.removeAttribute("enabled");
+				        createTourButton.setAttribute("disabled", "disabled");
+				        createTourButton.removeAttribute("class");
+				        createTourButton.setAttribute("class", "btn btn-disabled");
+			        }
+                }
+            });
+		    insertAfter(numberOfKilometersInput, lastElement);
+		    insertAfter(levelDifferenceInput, numberOfKilometersInput);
+
+		    lastElement = levelDifferenceInput;
 }
 
 function showOwnPointInputs(checkbox) {
-	if (checkbox.checked || isLastPointOwn) {
+	if (checkbox.checked && !forcedKilometersInput) {
         ownPoint = true;
-		let mountainRangeSelect = document.createElement("select");
-		mountainRangeSelect.id = "mountainRange" + currentIndex;
+		mountainRangeSelect = lastElement == mountainRangeSelect ? mountainRangeSelect : document.createElement("select");
+		mountainRangeSelect.id = lastElement == mountainRangeSelect ? mountainRangeSelect.id : "mountainRange" + currentIndex;
+        if (lastElement != mountainRangeSelect) {
         for (const val of allMountainRanges) {
             let option = document.createElement("option");
             option.value = val.mountainRangeId;
             option.text = val.name;
             mountainRangeSelect.appendChild(option);
         }
-		let numberOfKilometersInput = document.createElement("input");
-		numberOfKilometersInput.type = "text";
-        numberOfKilometersInput.pattern = "[0-9]+"
-		numberOfKilometersInput.id = "numberOfKilometers" + currentIndex;
-        numberOfKilometersInput.placeholder = "Liczba kilometrów";
-		let levelDifferenceInput = document.createElement("input");
-		levelDifferenceInput.type = "number";
-		levelDifferenceInput.id = "levelDifferenceInput" + currentIndex;
-        levelDifferenceInput.pattern = "[0-9]+";
-        levelDifferenceInput.placeholder = "Suma różnic poziomów";
+        }
+        console.log("Before insert after");
+        insertAfter(mountainRangeSelect, checkbox);
+        console.log("After insert after");
+        if (currentIndex > 0) {
+		    numberOfKilometersInput = document.createElement("input");
+		    numberOfKilometersInput.type = "text";
+            numberOfKilometersInput.pattern = "[0-9]+"
+		    numberOfKilometersInput.id = "numberOfKilometers" + currentIndex;
+            numberOfKilometersInput.placeholder = "Liczba kilometrów";
+            numberOfKilometersInput.addEventListener('click', function(e) {
+                if (e.target.value.length > 0 && levelDifferenceInput.value.length > 0) {
+                    createAnotherPointButton.removeAttribute("disabled");
+			        createAnotherPointButton.setAttribute("enabled", "enabled");
+			        createAnotherPointButton.removeAttribute("class");
+			        createAnotherPointButton.setAttribute("class", "btn btn-primary");
+			        if (currentIndex > 0) {
+				    createTourButton.removeAttribute("disabled");
+				    createTourButton.setAttribute("enabled", "enabled");
+				    createTourButton.removeAttribute("class");
+				    createTourButton.setAttribute("class", "btn btn-success");
+			        }
+                }
+                else {
+                    createAnotherPointButton.removeAttribute("enabled");
+			        createAnotherPointButton.setAttribute("disabled", "disabled");
+			        createAnotherPointButton.removeAttribute("class");
+			        createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+			        if (currentIndex > 0) {
+				        createTourButton.removeAttribute("enabled");
+				        createTourButton.setAttribute("disabled", "disabled");
+				        createTourButton.removeAttribute("class");
+				        createTourButton.setAttribute("class", "btn btn-disabled");
+			        }
+                }
+            });
+		    levelDifferenceInput = document.createElement("input");
+		    levelDifferenceInput.type = "text";
+		    levelDifferenceInput.id = "levelDifferenceInput" + currentIndex;
+            levelDifferenceInput.pattern = "[0-9]+";
+            levelDifferenceInput.placeholder = "Suma różnic poziomów";
+            levelDifferenceInput.addEventListener('click', function(e) {
+                if (e.target.value.length > 0 && numberOfKilometersInput.value.length > 0) {
+                    createAnotherPointButton.removeAttribute("disabled");
+			        createAnotherPointButton.setAttribute("enabled", "enabled");
+			        createAnotherPointButton.removeAttribute("class");
+			        createAnotherPointButton.setAttribute("class", "btn btn-primary");
+			        if (currentIndex > 0) {
+				    createTourButton.removeAttribute("disabled");
+				    createTourButton.setAttribute("enabled", "enabled");
+				    createTourButton.removeAttribute("class");
+				    createTourButton.setAttribute("class", "btn btn-success");
+			        }
+                }
+                else {
+                    createAnotherPointButton.removeAttribute("enabled");
+			        createAnotherPointButton.setAttribute("disabled", "disabled");
+			        createAnotherPointButton.removeAttribute("class");
+			        createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+			        if (currentIndex > 0) {
+				        createTourButton.removeAttribute("enabled");
+				        createTourButton.setAttribute("disabled", "disabled");
+				        createTourButton.removeAttribute("class");
+				        createTourButton.setAttribute("class", "btn btn-disabled");
+			        }
+                }
+            });
+		    insertAfter(numberOfKilometersInput, mountainRangeSelect);
+		    insertAfter(levelDifferenceInput, numberOfKilometersInput);
 
-		insertAfter(mountainRangeSelect, checkbox);
-		insertAfter(numberOfKilometersInput, mountainRangeSelect);
-		insertAfter(levelDifferenceInput, numberOfKilometersInput);
-
-		lastElement = levelDifferenceInput;
+		    lastElement = levelDifferenceInput;
+        }
+        else {
+            createAnotherPointButton.removeAttribute("disabled");
+			createAnotherPointButton.setAttribute("enabled", "enabled");
+			createAnotherPointButton.removeAttribute("class");
+			createAnotherPointButton.setAttribute("class", "btn btn-primary");
+			if (currentIndex > 0) {
+			createTourButton.removeAttribute("disabled");
+			createTourButton.setAttribute("enabled", "enabled");
+			createTourButton.removeAttribute("class");
+			createTourButton.setAttribute("class", "btn btn-success");
+			}
+   //         createAnotherPointButton.removeAttribute("enabled");
+			//createAnotherPointButton.setAttribute("disabled", "disabled");
+			//createAnotherPointButton.removeAttribute("class");
+			//createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+			//if (currentIndex > 0) {
+			//	createTourButton.removeAttribute("enabled");
+			//	createTourButton.setAttribute("disabled", "disabled");
+			//	createTourButton.removeAttribute("class");
+			//	createTourButton.setAttribute("class", "btn btn-disabled");
+			//}
+            lastElement = mountainRangeSelect;
+        }
 	}
-	else {
+	else if (!checkbox.checked  && !forcedKilometersInput) {
+        createAnotherPointButton.removeAttribute("enabled");
+		createAnotherPointButton.setAttribute("disabled", "disabled");
+		createAnotherPointButton.removeAttribute("class");
+		createAnotherPointButton.setAttribute("class", "btn btn-disabled");
+        createTourButton.removeAttribute("enabled");
+		createTourButton.setAttribute("disabled", "disabled");
+		createTourButton.removeAttribute("class");
+		createTourButton.setAttribute("class", "btn btn-disabled");
         ownPoint = false;
 		let mountainRangeSelect = document.getElementById("mountainRange" + currentIndex);
 		mountainRangeSelect.remove();
@@ -367,6 +580,8 @@ function validateCurrentInputValue() {
 }
 
 function insertAfter(newNode, referenceNode) {
+    console.log(newNode);
+    console.log(referenceNode);
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
     </script>
