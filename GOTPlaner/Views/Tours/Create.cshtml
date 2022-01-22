@@ -62,16 +62,23 @@ let currentPointsPointAdvantage = {};
 let currentPointsMountainRangeIds = {};
 let currentPointsMountainRangeNames = {};
 let currentPointsNames = [];
+let currentPointsNamesOnly = [];
 
 function getAllTouristPoints() {
     var json;
     $.getJSON('https://localhost:5001/api/TouristPoints', function (data) {
         json = data;
     });
+    currentPointsIds = {};
+    currentPointsMountainRangeIds = {};
+    currentPointsPointAdvantage = {};
+    currentPointsNames = [];
+    currentPointsNamesOnly = {};
     for (let i = 0; i < json.length; i++) {
         currentPointsIds[json[i].apiName] = json[i].id;
         currentPointsMountainRangeIds[json[i].apiName] = json[i].mountainRangeId;
         currentPointsNames[i] = json[i].apiName;
+        currentPointsNamesOnly[json[i].apiName] = json[i].name;
     }
     return json.map(function(pointDto) {
         return pointDto.apiName;
@@ -88,11 +95,13 @@ function getAllTouristPointsPossibleFromSpecificTouristPoint(id) {
     currentPointsMountainRangeIds = {};
     currentPointsPointAdvantage = {};
     currentPointsNames = [];
+    currentPointsNamesOnly = {};
     for (let i = 0; i < json.length; i++) {
         currentPointsIds[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].touristPointDto.id;
         currentPointsMountainRangeIds[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].touristPointDto.mountainRangeId;
         currentPointsPointAdvantage[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].pointsToGain;
         currentPointsNames[i] = json[i].touristPointDto.apiName + " | " + json[i].pointsToGain;
+        currentPointsNamesOnly[json[i].touristPointDto.apiName + " | " + json[i].pointsToGain] = json[i].touristPointDto.name;
     }
     return json.map(function(pointInfo) {
         return pointInfo.touristPointDto.apiName + " | " + pointInfo.pointsToGain;
@@ -299,13 +308,22 @@ function changeState(e) {
 }
 
 function addToFormData() {
+    let id = checkboxOwn.checked ? 0 : currentPointsIds[lastInput.value];
+    let name = checkboxOwn.checked ? lastInput.value : currentPointsNamesOnly[lastInput.value];
+    let pointsForItem;
+    if (checkboxOwn.checked || numberOfKilometersInput != undefined) {
+        let numberOfKilometersPoints = parseInt(numberOfKilometersInput.value);
+        let levelOfDifferencePoints = Math.floor(parseInt(levelDifferenceInput.value) / 100 + (parseInt(levelDifferenceInput.value) % 100 >= 51 ? 1 : 0))
+        pointsForItem = parseInt(numberOfKilometersInput.value) + levelOfDifferencePoints;
+    }
     formData[currentIndex] = {
-        touristPointId : currentPointsIds[lastInput.value],
-        touristPointName : lastInput.value,
-        currentPoints : currentPointsPointAdvantage[lastInput.value],
+        touristPointId : id,
+        touristPointName : name,
+        currentPoints : checkboxOwn.checked || numberOfKilometersInput != undefined ? pointsForItem : currentPointsPointAdvantage[lastInput.value],
         ownPoint : checkboxOwn.checked,
         numberOfKilometers : numberOfKilometersInput != undefined ? numberOfKilometersInput.value : undefined,
-        levelDifference : levelDifferenceInput != undefined ? levelDifferenceInput.value : undefined
+        levelDifference : levelDifferenceInput != undefined ? levelDifferenceInput.value : undefined,
+        mountainRangeId = checkboxOwn.checked ? mountainRangeSelect.value : mountainRangesIds[lastInput.value]
     };
 }
 
@@ -469,8 +487,8 @@ function showOwnPointInputs(checkbox) {
             numberOfKilometersInput.pattern = "[0-9]+"
 		    numberOfKilometersInput.id = "numberOfKilometers" + currentIndex;
             numberOfKilometersInput.placeholder = "Liczba kilometrów";
-            numberOfKilometersInput.addEventListener('click', function(e) {
-                if (e.target.value.length > 0 && levelDifferenceInput.value.length > 0) {
+            numberOfKilometersInput.addEventListener('change', function(e) {
+                if (e.target.value.length > 0 && levelDifferenceInput.value.length > 0 && checkboxOwn.checked) {
                     createAnotherPointButton.removeAttribute("disabled");
 			        createAnotherPointButton.setAttribute("enabled", "enabled");
 			        createAnotherPointButton.removeAttribute("class");
@@ -500,8 +518,8 @@ function showOwnPointInputs(checkbox) {
 		    levelDifferenceInput.id = "levelDifferenceInput" + currentIndex;
             levelDifferenceInput.pattern = "[0-9]+";
             levelDifferenceInput.placeholder = "Suma różnic poziomów";
-            levelDifferenceInput.addEventListener('click', function(e) {
-                if (e.target.value.length > 0 && numberOfKilometersInput.value.length > 0) {
+            levelDifferenceInput.addEventListener('change', function(e) {
+                if (e.target.value.length > 0 && numberOfKilometersInput.value.length > 0 && checkboxOwn.checked) {
                     createAnotherPointButton.removeAttribute("disabled");
 			        createAnotherPointButton.setAttribute("enabled", "enabled");
 			        createAnotherPointButton.removeAttribute("class");
@@ -568,9 +586,13 @@ function showOwnPointInputs(checkbox) {
 		let mountainRangeSelect = document.getElementById("mountainRange" + currentIndex);
 		mountainRangeSelect.remove();
 		let numberOfKilometersInput = document.getElementById("numberOfKilometers" + currentIndex);
-		numberOfKilometersInput.remove();
+        if (numberOfKilometersInput != undefined) {
+		    numberOfKilometersInput.remove();
+        }
 		let levelDifferenceInput = document.getElementById("levelDifferenceInput" + currentIndex);
-		levelDifferenceInput.remove();
+        if (levelDifferenceInput != undefined) {
+		    levelDifferenceInput.remove();
+        }
 		lastElement = checkbox;
 	}
 }

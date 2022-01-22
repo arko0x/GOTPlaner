@@ -19,6 +19,7 @@ namespace GOTPlaner.Models.DTO
         public int? NumberOfKilometers { get; set; }
         [JsonProperty("levelDifference")]
         public int? LevelDifference { get; set; }
-
+        [JsonProperty("mountainRangeId")]
+        public int MountainRangeId { get; set; }
     }
 }
