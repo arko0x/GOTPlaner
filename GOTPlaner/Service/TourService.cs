@@ -19,6 +19,7 @@ namespace GOTPlaner.Service
 
         public void BuildTour(List<TourItemDto> tourItemDtos)
         {
+            List<TouristPoint> addedTouristPoints = new List<TouristPoint>();
             Tour tour = new Tour
             {
                 CreationDate = System.DateTime.Now,
@@ -36,11 +37,14 @@ namespace GOTPlaner.Service
                     {
                         ElementType = _context.ElementTypes.Where(e => e.ElementTypeId == ElementTypeId.UserType).First(),
                         ElementTypeId = ElementTypeId.UserType,
-                        MountainRange = _context.MountainRanges.Where(m => m.Name.Equals(tourItemDtos[i - 1].MountainRangeName)),
-                        MountainRangeId = _context.MountainRanges.Where(m => m.Name.Equals(tourItemDtos[i - 1].MountainRangeId)),
+                        MountainRangeId = _context.MountainRanges.Where(m => (int)m.MountainRangeId == tourItemDtos[i - 1].MountainRangeId).First().MountainRangeId,
                         Name = tourItemDtos[i - 1].TouristPointName
                     };
-                    _context.Add<TouristPoint>(previousTouristPoint);
+                    if (!addedTouristPoints.Contains(previousTouristPoint))
+                    {
+                        _context.Add<TouristPoint>(previousTouristPoint);
+                        addedTouristPoints.Add(previousTouristPoint);
+                    }
                 }
                 else
                 {
@@ -57,13 +61,17 @@ namespace GOTPlaner.Service
                         MountainRangeId = _context.MountainRanges.Where(m => ((int)m.MountainRangeId == tourItemDtos[i].MountainRangeId)).First().MountainRangeId,
                         Name = tourItemDtos[i].TouristPointName
                     };
-                    _context.Add<TouristPoint>(currentTouristPoint);
+                    if (!addedTouristPoints.Contains(currentTouristPoint))
+                    {
+                        _context.Add<TouristPoint>(currentTouristPoint);
+                        addedTouristPoints.Add(currentTouristPoint);
+                    }
                 }
                 else
                 {
                     currentTouristPoint = _context.TouristPoints.Where(t => t.ID == tourItemDtos[i].TouristPointId).First();
                 }
-
+                _context.SaveChanges();
                 Segment segment;
                 if (tourItemDtos[i - 1].OwnPoint || tourItemDtos[i].OwnPoint)
                 {
@@ -74,9 +82,19 @@ namespace GOTPlaner.Service
                         LevelDifferenceSum = tourItemDtos[i].LevelDifference.Value,
                         NumberOfKilometers = tourItemDtos[i].NumberOfKilometers.Value,
                         PointsAB = tourItemDtos[i].CurrentPoints.Value,
-                        TouristPointA = previousTouristPoint
+                        TouristPointAId = previousTouristPoint.ID,
+                        TouristPointBId = currentTouristPoint.ID
                     };
-                    _context.Add<Segment>(segment);
+                    var possiblyExistingSegment = _context.Segments.Where(s => s.TouristPointAId == currentTouristPoint.ID && s.TouristPointBId == previousTouristPoint.ID).FirstOrDefault();
+                    if (possiblyExistingSegment == null)
+                    {
+                        _context.Update<Segment>(segment);
+                    }
+                    else
+                    {
+                        possiblyExistingSegment.PointsBA = tourItemDtos[i].CurrentPoints.Value;
+                        _context.Update<Segment>(possiblyExistingSegment);
+                    }
                 }
                 else
                 {
@@ -90,11 +108,13 @@ namespace GOTPlaner.Service
                 {
                     Tour = tour,
                     Segment = segment,
-                    Order = i
+                    Order = i,
+                    Direction = previousTouristPoint.ID == segment.TouristPointAId ? true : false
                 };
 
                 _context.Add(segmentCross);
             }
+            _context.SaveChanges();
         }
     }
 }

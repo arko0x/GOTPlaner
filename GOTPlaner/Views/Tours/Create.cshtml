@@ -311,7 +311,7 @@ function addToFormData() {
     let id = checkboxOwn.checked ? 0 : currentPointsIds[lastInput.value];
     let name = checkboxOwn.checked ? lastInput.value : currentPointsNamesOnly[lastInput.value];
     let pointsForItem;
-    if (checkboxOwn.checked || numberOfKilometersInput != undefined) {
+    if (checkboxOwn.checked && numberOfKilometersInput != undefined) {
         let numberOfKilometersPoints = parseInt(numberOfKilometersInput.value);
         let levelOfDifferencePoints = Math.floor(parseInt(levelDifferenceInput.value) / 100 + (parseInt(levelDifferenceInput.value) % 100 >= 51 ? 1 : 0))
         pointsForItem = parseInt(numberOfKilometersInput.value) + levelOfDifferencePoints;
@@ -323,7 +323,7 @@ function addToFormData() {
         ownPoint : checkboxOwn.checked,
         numberOfKilometers : numberOfKilometersInput != undefined ? numberOfKilometersInput.value : undefined,
         levelDifference : levelDifferenceInput != undefined ? levelDifferenceInput.value : undefined,
-        mountainRangeId = checkboxOwn.checked ? mountainRangeSelect.value : mountainRangesIds[lastInput.value]
+        mountainRangeId : checkboxOwn.checked ? mountainRangeSelect.value : currentPointsMountainRangeIds[lastInput.value]
     };
 }
 

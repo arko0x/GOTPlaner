@@ -1,4 +1,5 @@
 ﻿using GOTPlaner.Models.DTO;
+using GOTPlaner.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,11 +11,17 @@ namespace GOTPlaner.Controllers.API
     [ApiController]
     public class ToursRestController : ControllerBase
     {
+        private TourService _tourService;
+        public ToursRestController(TourService tourService)
+        {
+            _tourService = tourService;
+        }
+
         [HttpPost]
         [Route("/api/Tours/Create")]
         public void AddTour(List<TourItemDto> tourItemDtos)
         {
-            var result = "";
+            _tourService.BuildTour(tourItemDtos);
         }
     }
 }

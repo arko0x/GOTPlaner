@@ -1,4 +1,5 @@
 using GOTPlaner.Data;
+using GOTPlaner.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -31,7 +32,7 @@ namespace GOTPlaner
             string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContextPool<GotContext>(
                 options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr)));
-
+            services.AddScoped<TourService>();
 
             services.AddControllersWithViews();
             services.AddDefaultIdentity<IdentityUser>(options =>
