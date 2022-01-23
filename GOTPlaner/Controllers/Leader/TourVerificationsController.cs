@@ -61,11 +61,11 @@ namespace GOTPlaner.Controllers.Leader
         }
 
         [HttpPost]
-        public IActionResult Reject(int ID, string reason)
+        public IActionResult Reject(int ID, string reason, string user)
         {
             var verification = _context.TourVerifications.First(v => v.ID == ID);
             verification.Reason = reason;
-            //verification.LeaderEmail = User.Identity.Name;
+            verification.LeaderEmail = user == null ? User.Identity.Name : user;
             verification.VerificationDate = DateTime.Now;
             verification.TourVerificationStatusId = TourVerificationStatusId.Odrzucona;
             _context.Update(verification);
@@ -74,11 +74,11 @@ namespace GOTPlaner.Controllers.Leader
         }
 
         [HttpPost]
-        public IActionResult Confirm(int ID)
+        public IActionResult Confirm(int ID, string user)
         {
             var verification = _context.TourVerifications.First(v => v.ID == ID);
             verification.Reason = "";
-            //verification.LeaderEmail = User.Identity.Name;
+            verification.LeaderEmail = user == null ? User.Identity.Name : user;
             verification.VerificationDate = DateTime.Now;
             verification.TourVerificationStatusId = TourVerificationStatusId.Zaakceptowana;
             _context.Update(verification);

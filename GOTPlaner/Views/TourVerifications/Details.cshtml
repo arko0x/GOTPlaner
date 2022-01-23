@@ -11,17 +11,18 @@
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Status)
         </dt>
-        <dd class="col-sm-10">
+        <dd id="status" class="col-sm-10">
             @Html.DisplayFor(model => model.Status.Name)
         </dd>
     </div>
-    @if (Model.LeaderEmail != null)
+    @if (Model.TourVerificationStatusId == TourVerificationStatusId.DoPonownegoRozpatrzenia || 
+         Model.TourVerificationStatusId == TourVerificationStatusId.Odrzucona)
     {
         <div style="float: right; width:45%">
             <dt class="col-sm-2" style="display: inline">
                 @Html.DisplayNameFor(model => model.Reason)
             </dt>
-            <dd class="col-sm-10">
+            <dd id="reason" class="col-sm-10">
                 @Html.DisplayFor(model => model.Reason)
             </dd>
         </div>

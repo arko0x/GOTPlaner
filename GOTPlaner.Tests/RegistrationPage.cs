@@ -16,7 +16,7 @@ namespace GOTPlaner.Tests
         private IWebElement _create => _driver.FindElement(By.Id("create"));
 
         public string source => _driver.PageSource;
-        public string errorMessage => _driver.FindElement(By.XPath("//div[@class='text-danger validation-summary-errors']//ul//li")).Text;
+        //public string errorMessage => _driver.FindElement(By.XPath("//div[@class='text-danger validation-summary-errors']//ul//li")).Text;
 
         public RegistrationPage(IWebDriver driver) => _driver = driver;
         

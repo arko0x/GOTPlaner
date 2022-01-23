@@ -10,11 +10,11 @@ using GOTPlaner.Models;
 
 namespace GOTPlaner.Tests
 {
-    public class AutomatedVerificationTest : IDisposable
+    public class VerificationTest : IDisposable
     {
         private readonly GotContext _context;
 
-        public AutomatedVerificationTest()
+        public VerificationTest()
         {
             var options = new DbContextOptionsBuilder<GotContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
@@ -29,8 +29,8 @@ namespace GOTPlaner.Tests
         {
             int id = 1;
             var con = new TourVerificationsController(_context);
-            
-            var view = con.Confirm(id);
+
+            var view = con.Confirm(id, "leader@localhost");
             var tour = _context.TourVerifications.First(t => t.ID == id);
 
             Assert.Equal(TourVerificationStatusId.Zaakceptowana, tour.TourVerificationStatusId);
@@ -39,21 +39,24 @@ namespace GOTPlaner.Tests
         [Fact]
         public void Reject_Tour()
         {
+            
             int id = 1;
             string reason = "reason";
             var con = new TourVerificationsController(_context);
-            
-            var view = con.Reject(id, reason);
+
+            var view = con.Reject(id, reason, "leader@localhost");
             var tour = _context.TourVerifications.First(t => t.ID == id);
 
             Assert.Equal(TourVerificationStatusId.Odrzucona, tour.TourVerificationStatusId);
             Assert.Equal(reason, tour.Reason);
+
         }
 
         public void Dispose()
         {
             _context.Database.EnsureDeleted();
             _context.Dispose();
+
         }
     }
 }
