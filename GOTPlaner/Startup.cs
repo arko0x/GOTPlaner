@@ -29,9 +29,9 @@ namespace GOTPlaner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContextPool<GotContext>(
-                options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr)));
+            services.AddDbContextPool<GotContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("MyDb")));
+
             services.AddScoped<TourService>();
 
             services.AddControllersWithViews();

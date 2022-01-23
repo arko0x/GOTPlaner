@@ -20,6 +20,7 @@ namespace GOTPlaner.Controllers.Leader
         }
 
         // GET: TourVerifications
+        [Route("TourVerifications/Index")]
         public async Task<IActionResult> Index()
         {
             var gotContext = _context.TourVerifications.Include(t => t.Status)
@@ -65,7 +66,7 @@ namespace GOTPlaner.Controllers.Leader
         {
             var verification = _context.TourVerifications.First(v => v.ID == ID);
             verification.Reason = reason;
-            verification.LeaderEmail = user == null ? User.Identity.Name : user;
+            verification.LeaderEmail = user ?? User.Identity.Name;
             verification.VerificationDate = DateTime.Now;
             verification.TourVerificationStatusId = TourVerificationStatusId.Odrzucona;
             _context.Update(verification);
@@ -78,7 +79,7 @@ namespace GOTPlaner.Controllers.Leader
         {
             var verification = _context.TourVerifications.First(v => v.ID == ID);
             verification.Reason = "";
-            verification.LeaderEmail = user == null ? User.Identity.Name : user;
+            verification.LeaderEmail = user ?? User.Identity.Name;
             verification.VerificationDate = DateTime.Now;
             verification.TourVerificationStatusId = TourVerificationStatusId.Zaakceptowana;
             _context.Update(verification);

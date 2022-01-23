@@ -39,7 +39,6 @@ namespace GOTPlaner.Tests
         [Fact]
         public void Reject_Tour()
         {
-            
             int id = 1;
             string reason = "reason";
             var con = new TourVerificationsController(_context);
@@ -48,8 +47,7 @@ namespace GOTPlaner.Tests
             var tour = _context.TourVerifications.First(t => t.ID == id);
 
             Assert.Equal(TourVerificationStatusId.Odrzucona, tour.TourVerificationStatusId);
-            Assert.Equal(reason, tour.Reason);
-
+            Assert.Equal(reason, tour.Reason); 
         }
 
         public void Dispose()
