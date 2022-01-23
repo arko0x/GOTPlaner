@@ -7,18 +7,18 @@ namespace GOTPlaner.ViewModels
     public class CreateSegmentViewModel
     {
         public Segment Segment { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole Punkt A jest wymagane")]
         [MaxLength(255)]
         public string PointA { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole Punkt B jest wymagane")]
         [MaxLength(255)]
         public string PointB { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole Punkty AB jest wymagane")]
         public int PointsAB { get; set; }
         public int PointsBA { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole Suma różnic poziomów jest wymagane")]
         public int LevelDifferenceSum { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Pole Liczba kilometrów jest wymagane")]
         public int NumberOfKilometers { get; set; }
         public IEnumerable<MountainRange> MountainRanges { get; set; }
         [Required]

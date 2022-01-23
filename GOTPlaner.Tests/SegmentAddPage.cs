@@ -1,4 +1,6 @@
-﻿using OpenQA.Selenium;
+﻿using GOTPlaner.Models;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +21,8 @@ namespace GOTPlaner.Tests
         private const string _numberOfKilometersLocator = "NumberOfKilometers";
         private const string _levelDifferenceLocator = "LevelDifferenceSum";
         private const string _addSegmentButtonLocator = "/html/body/div/main/div[1]/div/form/div[10]/input";
+        private const string _mountainRangeASelectLocator = "MountainRangeAId";
+        private const string _mountainRangeBSelectLocator = "MountainRangeBId";
 
         public string source => _driver.PageSource;
 
@@ -29,6 +33,8 @@ namespace GOTPlaner.Tests
         private IWebElement _numberOfKilometers;
         private IWebElement _levelDifference;
         private IWebElement _addSegmentButton;
+        private SelectElement _mountainRangeASelect;
+        private SelectElement _mountainRangeBSelect;
 
         public SegmentAddPage(IWebDriver driver)
         {
@@ -50,11 +56,25 @@ namespace GOTPlaner.Tests
             _numberOfKilometers = _driver.FindElement(By.Id(_numberOfKilometersLocator));
             _levelDifference = _driver.FindElement(By.Id(_levelDifferenceLocator));
             _addSegmentButton = _driver.FindElement(By.XPath(_addSegmentButtonLocator));
+            _mountainRangeASelect = new SelectElement(_driver.FindElement(By.Id(_mountainRangeASelectLocator)));
+            _mountainRangeBSelect = new SelectElement(_driver.FindElement(By.Id(_mountainRangeBSelectLocator)));
         }
 
         public SegmentAddPage EnterPointA(string value)
         {
             _pointA.SendKeys(value);
+            return this;
+        }
+
+        public SegmentAddPage SelectMountainRangeA(MountainRangeId mountainRangeId)
+        {
+            _mountainRangeASelect.SelectByText(mountainRangeId.ToString());
+            return this;
+        }
+
+        public SegmentAddPage SelectMountainRangeB(MountainRangeId mountainRangeId)
+        {
+            _mountainRangeBSelect.SelectByText(mountainRangeId.ToString());
             return this;
         }
 

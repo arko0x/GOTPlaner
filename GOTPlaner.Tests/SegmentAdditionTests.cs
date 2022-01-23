@@ -33,7 +33,7 @@ namespace GOTPlaner.Tests
 
             _page.AddSegment();
 
-            Assert.Contains("The PointA field is required", _page.source);
+            Assert.Contains("Pole Punkt A jest wymagane", _page.source);
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace GOTPlaner.Tests
 
             _page.AddSegment();
 
-            Assert.Contains("The PointB field is required", _page.source);
+            Assert.Contains("Pole Punkt B jest wymagane", _page.source);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace GOTPlaner.Tests
 
             _page.AddSegment();
 
-            Assert.Contains("The PointsAB field is required", _page.source);
+            Assert.Contains("Pole Punkty AB jest wymagane", _page.source);
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace GOTPlaner.Tests
 
             _page.AddSegment();
 
-            Assert.Contains("The NumberOfKilometers field is required", _page.source);
+            Assert.Contains("Pole Liczba kilometrów jest wymagane", _page.source);
         }
 
         [Fact]
@@ -95,7 +95,24 @@ namespace GOTPlaner.Tests
 
             _page.AddSegment();
 
-            Assert.Contains("The LevelDifferenceSum field is required", _page.source);
+            Assert.Contains("Pole Suma różnic poziomów jest wymagane", _page.source);
+        }
+
+        [Fact] 
+        public void WhenSegmentAlreadyExistsThenShowError()
+        {
+            _page.EnterPointA("Prełuki")
+                .SelectMountainRangeA(Models.MountainRangeId.Bieszczady)
+                .EnterPointB("Dyszowa")
+                .SelectMountainRangeB(Models.MountainRangeId.Bieszczady)
+                .EnterPointsAB("10")
+                .EnterPointsBA("10")
+                .EnterNumberOfKilometers("10")
+                .EnterLevelDifference("100");
+
+            _page.AddSegment();
+
+            Assert.Contains("Taki odcinek istnieje już w systemie", _page.source);
         }
         public void Dispose()
         {
