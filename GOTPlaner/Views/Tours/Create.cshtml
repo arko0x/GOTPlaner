@@ -311,7 +311,7 @@ function addToFormData() {
     let id = checkboxOwn.checked ? 0 : currentPointsIds[lastInput.value];
     let name = checkboxOwn.checked ? lastInput.value : currentPointsNamesOnly[lastInput.value];
     let pointsForItem;
-    if (checkboxOwn.checked && numberOfKilometersInput != undefined) {
+    if (checkboxOwn.checked && numberOfKilometersInput != undefined || isLastPointOwn) {
         let numberOfKilometersPoints = parseInt(numberOfKilometersInput.value);
         let levelOfDifferencePoints = Math.floor(parseInt(levelDifferenceInput.value) / 100 + (parseInt(levelDifferenceInput.value) % 100 >= 51 ? 1 : 0))
         pointsForItem = parseInt(numberOfKilometersInput.value) + levelOfDifferencePoints;
@@ -319,7 +319,7 @@ function addToFormData() {
     formData[currentIndex] = {
         touristPointId : id,
         touristPointName : name,
-        currentPoints : checkboxOwn.checked || numberOfKilometersInput != undefined ? pointsForItem : currentPointsPointAdvantage[lastInput.value],
+        currentPoints : checkboxOwn.checked || numberOfKilometersInput != undefined || isLastPointOwn ? pointsForItem : currentPointsPointAdvantage[lastInput.value],
         ownPoint : checkboxOwn.checked,
         numberOfKilometers : numberOfKilometersInput != undefined ? numberOfKilometersInput.value : undefined,
         levelDifference : levelDifferenceInput != undefined ? levelDifferenceInput.value : undefined,
@@ -328,13 +328,21 @@ function addToFormData() {
 }
 
 function sendFormDataToServer() {
-    console.log("Send funfction called");
+    // we should also add last entered point to form data
+    addToFormData();
+
     $(function() {
         $.ajax({
             type: "POST",
             data: JSON.stringify(formData),
             url: "/api/Tours/Create",
-            contentType: "application/json"
+            contentType: "application/json",
+            success: function(result) {
+                alert("Wycieczka została dodana do systemu!");
+            },
+            error: function(error) {
+                alert("Wystąpił błąd, zgłoś to do nas: " + error);
+            }
         });
     });
 }
