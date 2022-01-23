@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GOTPlaner", "GOTPlaner\GOTPlaner.csproj", "{3E64BF5A-39F9-481B-9BEF-C77E53790CAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GOTPlaner", "GOTPlaner\GOTPlaner.csproj", "{3E64BF5A-39F9-481B-9BEF-C77E53790CAD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GOTPlaner.Tests", "GOTPlaner.Tests\GOTPlaner.Tests.csproj", "{3B294C34-E322-48D7-A4CA-6C34490A8C73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{3E64BF5A-39F9-481B-9BEF-C77E53790CAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E64BF5A-39F9-481B-9BEF-C77E53790CAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E64BF5A-39F9-481B-9BEF-C77E53790CAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B294C34-E322-48D7-A4CA-6C34490A8C73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B294C34-E322-48D7-A4CA-6C34490A8C73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B294C34-E322-48D7-A4CA-6C34490A8C73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B294C34-E322-48D7-A4CA-6C34490A8C73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
