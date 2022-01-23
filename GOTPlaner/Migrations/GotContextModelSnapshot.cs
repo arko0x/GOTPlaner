@@ -160,11 +160,6 @@ namespace GOTPlaner.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
                     b.HasKey("Email");
 
                     b.HasIndex("IDCard")
@@ -180,8 +175,7 @@ namespace GOTPlaner.Migrations
                             Disability = false,
                             FirstName = "Michał",
                             IDCard = 112,
-                            LastName = "Głuś",
-                            Password = "Leader12"
+                            LastName = "Głuś"
                         },
                         new
                         {
@@ -190,8 +184,7 @@ namespace GOTPlaner.Migrations
                             Disability = false,
                             FirstName = "Kamil",
                             IDCard = 997,
-                            LastName = "Zdun",
-                            Password = "Leader12"
+                            LastName = "Zdun"
                         });
                 });
 
@@ -455,7 +448,7 @@ namespace GOTPlaner.Migrations
                         new
                         {
                             ID = 1,
-                            CrossDate = new DateTime(2021, 10, 26, 19, 5, 54, 781, DateTimeKind.Local).AddTicks(8387),
+                            CrossDate = new DateTime(2021, 10, 30, 13, 59, 16, 382, DateTimeKind.Local).AddTicks(1760),
                             Direction = true,
                             ImageName = "preluki.jpg",
                             Order = 1,
@@ -465,7 +458,7 @@ namespace GOTPlaner.Migrations
                         new
                         {
                             ID = 2,
-                            CrossDate = new DateTime(2021, 10, 26, 20, 17, 54, 781, DateTimeKind.Local).AddTicks(9850),
+                            CrossDate = new DateTime(2021, 10, 30, 15, 11, 16, 382, DateTimeKind.Local).AddTicks(3017),
                             Direction = true,
                             ImageName = "mikow.jpg",
                             Order = 2,
@@ -475,7 +468,7 @@ namespace GOTPlaner.Migrations
                         new
                         {
                             ID = 3,
-                            CrossDate = new DateTime(2021, 10, 26, 21, 26, 54, 781, DateTimeKind.Local).AddTicks(9872),
+                            CrossDate = new DateTime(2021, 10, 30, 16, 20, 16, 382, DateTimeKind.Local).AddTicks(3038),
                             Direction = true,
                             ImageName = "jaworne.jpg",
                             Order = 3,
@@ -485,7 +478,7 @@ namespace GOTPlaner.Migrations
                         new
                         {
                             ID = 4,
-                            CrossDate = new DateTime(2021, 10, 26, 23, 5, 54, 781, DateTimeKind.Local).AddTicks(9878),
+                            CrossDate = new DateTime(2021, 10, 30, 17, 59, 16, 382, DateTimeKind.Local).AddTicks(3044),
                             Direction = true,
                             ImageName = "rabia.jpg",
                             Order = 4,
@@ -529,9 +522,9 @@ namespace GOTPlaner.Migrations
                         {
                             ID = 1,
                             BadgeTypeId = 1,
-                            CreationDate = new DateTime(2021, 10, 19, 0, 0, 0, 0, DateTimeKind.Local),
-                            EndDate = new DateTime(2021, 10, 26, 23, 5, 54, 781, DateTimeKind.Local).AddTicks(2529),
-                            StartDate = new DateTime(2021, 10, 26, 18, 18, 54, 781, DateTimeKind.Local).AddTicks(710),
+                            CreationDate = new DateTime(2021, 10, 23, 0, 0, 0, 0, DateTimeKind.Local),
+                            EndDate = new DateTime(2021, 10, 30, 17, 59, 16, 381, DateTimeKind.Local).AddTicks(6308),
+                            StartDate = new DateTime(2021, 10, 30, 13, 12, 16, 381, DateTimeKind.Local).AddTicks(2320),
                             TouristEmail = "tourist@localhost"
                         });
                 });
@@ -640,11 +633,6 @@ namespace GOTPlaner.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
                     b.HasKey("Email");
 
                     b.ToTable("Tourists");
@@ -656,8 +644,7 @@ namespace GOTPlaner.Migrations
                             BirthDate = new DateTime(1998, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Disability = false,
                             FirstName = "Jan",
-                            LastName = "Kowalski",
-                            Password = "Tourist1"
+                            LastName = "Kowalski"
                         });
                 });
 

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GOTPlaner.Migrations
 {
-    public partial class DBInit : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -104,8 +104,6 @@ namespace GOTPlaner.Migrations
                     LastName = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     BirthDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Password = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Disability = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IDCard = table.Column<int>(type: "int", nullable: false)
                 },
@@ -154,8 +152,6 @@ namespace GOTPlaner.Migrations
                     LastName = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     BirthDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Password = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Disability = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
@@ -576,11 +572,11 @@ namespace GOTPlaner.Migrations
 
             migrationBuilder.InsertData(
                 table: "Leaders",
-                columns: new[] { "Email", "BirthDate", "Disability", "FirstName", "IDCard", "LastName", "Password" },
+                columns: new[] { "Email", "BirthDate", "Disability", "FirstName", "IDCard", "LastName" },
                 values: new object[,]
                 {
-                    { "leader@localhost", new DateTime(1978, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Michał", 112, "Głuś", "Leader12" },
-                    { "leader2@localhost", new DateTime(1978, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Kamil", 997, "Zdun", "Leader12" }
+                    { "leader@localhost", new DateTime(1978, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Michał", 112, "Głuś" },
+                    { "leader2@localhost", new DateTime(1978, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Kamil", 997, "Zdun" }
                 });
 
             migrationBuilder.InsertData(
@@ -621,8 +617,8 @@ namespace GOTPlaner.Migrations
 
             migrationBuilder.InsertData(
                 table: "Tourists",
-                columns: new[] { "Email", "BirthDate", "Disability", "FirstName", "LastName", "Password" },
-                values: new object[] { "tourist@localhost", new DateTime(1998, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Jan", "Kowalski", "Tourist1" });
+                columns: new[] { "Email", "BirthDate", "Disability", "FirstName", "LastName" },
+                values: new object[] { "tourist@localhost", new DateTime(1998, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Jan", "Kowalski" });
 
             migrationBuilder.InsertData(
                 table: "TouristPoints",
@@ -640,7 +636,7 @@ namespace GOTPlaner.Migrations
             migrationBuilder.InsertData(
                 table: "Tours",
                 columns: new[] { "ID", "BadgeTypeId", "CreationDate", "EndDate", "StartDate", "TouristEmail" },
-                values: new object[] { 1, 1, new DateTime(2021, 10, 19, 0, 0, 0, 0, DateTimeKind.Local), new DateTime(2021, 10, 26, 23, 5, 54, 781, DateTimeKind.Local).AddTicks(2529), new DateTime(2021, 10, 26, 18, 18, 54, 781, DateTimeKind.Local).AddTicks(710), "tourist@localhost" });
+                values: new object[] { 1, 1, new DateTime(2021, 10, 23, 0, 0, 0, 0, DateTimeKind.Local), new DateTime(2021, 10, 30, 17, 59, 16, 381, DateTimeKind.Local).AddTicks(6308), new DateTime(2021, 10, 30, 13, 12, 16, 381, DateTimeKind.Local).AddTicks(2320), "tourist@localhost" });
 
             migrationBuilder.InsertData(
                 table: "Segments",
@@ -665,10 +661,10 @@ namespace GOTPlaner.Migrations
                 columns: new[] { "ID", "CrossDate", "Direction", "ImageName", "Order", "SegmentId", "TourId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2021, 10, 26, 19, 5, 54, 781, DateTimeKind.Local).AddTicks(8387), true, "preluki.jpg", 1, 1, 1 },
-                    { 2, new DateTime(2021, 10, 26, 20, 17, 54, 781, DateTimeKind.Local).AddTicks(9850), true, "mikow.jpg", 2, 2, 1 },
-                    { 3, new DateTime(2021, 10, 26, 21, 26, 54, 781, DateTimeKind.Local).AddTicks(9872), true, "jaworne.jpg", 3, 3, 1 },
-                    { 4, new DateTime(2021, 10, 26, 23, 5, 54, 781, DateTimeKind.Local).AddTicks(9878), true, "rabia.jpg", 4, 4, 1 }
+                    { 1, new DateTime(2021, 10, 30, 13, 59, 16, 382, DateTimeKind.Local).AddTicks(1760), true, "preluki.jpg", 1, 1, 1 },
+                    { 2, new DateTime(2021, 10, 30, 15, 11, 16, 382, DateTimeKind.Local).AddTicks(3017), true, "mikow.jpg", 2, 2, 1 },
+                    { 3, new DateTime(2021, 10, 30, 16, 20, 16, 382, DateTimeKind.Local).AddTicks(3038), true, "jaworne.jpg", 3, 3, 1 },
+                    { 4, new DateTime(2021, 10, 30, 17, 59, 16, 382, DateTimeKind.Local).AddTicks(3044), true, "rabia.jpg", 4, 4, 1 }
                 });
 
             migrationBuilder.CreateIndex(
