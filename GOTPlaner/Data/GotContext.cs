@@ -1,7 +1,6 @@
 ﻿using GOTPlaner.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 
@@ -12,9 +11,6 @@ namespace GOTPlaner.Data
         public GotContext(DbContextOptions<GotContext> options) : base(options)
         {
 
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -158,7 +154,7 @@ namespace GOTPlaner.Data
                 }));
 
             modelBuilder.Entity<Segment>()
-                .HasIndex(s => new { s.TouristPointAId, s.TouristPointBId })
+                .HasIndex(s => new { s.TouristPointAId, s.TouristPointBId})
                 .IsUnique();
 
             // data initialization
@@ -170,7 +166,6 @@ namespace GOTPlaner.Data
                     FirstName = "Jan",
                     LastName = "Kowalski",
                     BirthDate = DateTime.Parse("1998-01-01"),
-                    Password = "Tourist1",
                     Disability = false
                 });
 
@@ -182,7 +177,6 @@ namespace GOTPlaner.Data
                     FirstName = "Michał",
                     LastName = "Głuś",
                     BirthDate = DateTime.Parse("1978-01-01"),
-                    Password = "Leader12",
                     Disability = false,
                     IDCard = 112
                 },
@@ -192,7 +186,6 @@ namespace GOTPlaner.Data
                     FirstName = "Kamil",
                     LastName = "Zdun",
                     BirthDate = DateTime.Parse("1978-01-01"),
-                    Password = "Leader12",
                     Disability = false,
                     IDCard = 997
                 });
@@ -254,7 +247,7 @@ namespace GOTPlaner.Data
                     PointsBA = 8,
                     LevelDifferenceSum = 435,
                     NumberOfKilometers = 4.1,
-                    ElementTypeId = ElementTypeId.SystemType
+                    ElementTypeId= ElementTypeId.SystemType
                 },
                 new Segment
                 {
