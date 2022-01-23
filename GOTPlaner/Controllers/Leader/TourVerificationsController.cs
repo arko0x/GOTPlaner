@@ -32,11 +32,6 @@ namespace GOTPlaner.Controllers.Leader
         // GET: TourVerifications/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var tourVerification = await _context.TourVerifications
                 .Include(t => t.Status)
                 .Include(t => t.Tour.SegmentCrosses).ThenInclude(t => t.Segment.TouristPointA)
@@ -66,11 +61,11 @@ namespace GOTPlaner.Controllers.Leader
         }
 
         [HttpPost]
-        public IActionResult Reject(int ID, string reason)
+        public IActionResult Reject(int ID, string reason, string user)
         {
             var verification = _context.TourVerifications.First(v => v.ID == ID);
             verification.Reason = reason;
-            verification.LeaderEmail = User.Identity.Name;
+            verification.LeaderEmail = user == null ? User.Identity.Name : user;
             verification.VerificationDate = DateTime.Now;
             verification.TourVerificationStatusId = TourVerificationStatusId.Odrzucona;
             _context.Update(verification);
@@ -78,11 +73,12 @@ namespace GOTPlaner.Controllers.Leader
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Confirm(int ID)
+        [HttpPost]
+        public IActionResult Confirm(int ID, string user)
         {
             var verification = _context.TourVerifications.First(v => v.ID == ID);
             verification.Reason = "";
-            verification.LeaderEmail = User.Identity.Name;
+            verification.LeaderEmail = user == null ? User.Identity.Name : user;
             verification.VerificationDate = DateTime.Now;
             verification.TourVerificationStatusId = TourVerificationStatusId.Zaakceptowana;
             _context.Update(verification);

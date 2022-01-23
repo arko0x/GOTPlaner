@@ -14,17 +14,17 @@
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Tourist.FirstName"></label>
-                <input asp-for="Tourist.FirstName" class="form-control" />
+                <input id="name" asp-for="Tourist.FirstName" class="form-control" />
                 <span asp-validation-for="Tourist.FirstName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Tourist.LastName"></label>
-                <input asp-for="Tourist.LastName" class="form-control" />
+                <input id="last_name" asp-for="Tourist.LastName" class="form-control" />
                 <span asp-validation-for="Tourist.LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Tourist.BirthDate"></label>
-                <input asp-for="Tourist.BirthDate" class="form-control" />
+                <input id="birthdate" asp-for="Tourist.BirthDate" class="form-control" />
                 <span asp-validation-for="Tourist.BirthDate" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -34,15 +34,15 @@
             </div>
             <div class="form-group">
                 <label asp-for="Tourist.Email"></label>
-                <input asp-for="Tourist.Email" class="form-control" />
+                <input id="email" type="email" asp-for="Tourist.Email" class="form-control" />
                 <span asp-validation-for="Tourist.Email" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Tourist.Password"></label>
-                <input asp-for="Tourist.Password" class="form-control" />
+                <input id="password" asp-for="Tourist.Password" class="form-control" required />
                 <span asp-validation-for="Tourist.Password" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button id="create" type="submit" class="btn btn-primary">Register</button>
         </form>
     </div>
     <div class="col-md-6 col-md-offset-2">
