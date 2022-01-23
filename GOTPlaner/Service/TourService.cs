@@ -58,7 +58,7 @@ namespace GOTPlaner.Service
                     }
 
                     TouristPoint currentTouristPoint;
-                    if (_context.TouristPoints
+                    if (tourItemDtos[i].OwnPoint && _context.TouristPoints
                         .Where(tp => tp.Name.Equals(tourItemDtos[i].TouristPointName) &&
                         ((int)tp.MountainRangeId) == tourItemDtos[i].MountainRangeId).Count() == 0)
                     {

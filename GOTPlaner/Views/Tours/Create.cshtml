@@ -311,7 +311,7 @@ function addToFormData() {
     let id = checkboxOwn.checked ? 0 : currentPointsIds[lastInput.value];
     let name = checkboxOwn.checked ? lastInput.value : currentPointsNamesOnly[lastInput.value];
     let pointsForItem;
-    if (checkboxOwn.checked && numberOfKilometersInput != undefined || isLastPointOwn) {
+    if ((checkboxOwn.checked && numberOfKilometersInput != undefined || isLastPointOwn) && currentIndex != 0) {
         let numberOfKilometersPoints = parseInt(numberOfKilometersInput.value);
         let levelOfDifferencePoints = Math.floor(parseInt(levelDifferenceInput.value) / 100 + (parseInt(levelDifferenceInput.value) % 100 >= 51 ? 1 : 0))
         pointsForItem = parseInt(numberOfKilometersInput.value) + levelOfDifferencePoints;
@@ -319,7 +319,7 @@ function addToFormData() {
     formData[currentIndex] = {
         touristPointId : id,
         touristPointName : name,
-        currentPoints : checkboxOwn.checked || numberOfKilometersInput != undefined || isLastPointOwn ? pointsForItem : currentPointsPointAdvantage[lastInput.value],
+        currentPoints : checkboxOwn.checked || numberOfKilometersInput != undefined || (isLastPointOwn && currentIndex != 0) ? pointsForItem : currentPointsPointAdvantage[lastInput.value],
         ownPoint : checkboxOwn.checked,
         numberOfKilometers : numberOfKilometersInput != undefined ? numberOfKilometersInput.value : undefined,
         levelDifference : levelDifferenceInput != undefined ? levelDifferenceInput.value : undefined,
@@ -337,21 +337,26 @@ function sendFormDataToServer() {
             data: JSON.stringify(formData),
             url: "/api/Tours/Create",
             contentType: "application/json",
-            success: function(result) {
-                alert("Wycieczka została dodana do systemu!");
+            success: function(result, status) {
+                if (result.statusCode == 200) {
+                    alert("Wycieczka została dodana do systemu!");
+                }
+                else {
+                    alert("Wystąpił nieoczekiwany błąd");
+                }
             },
             error: function(error) {
-                alert("Wystąpił błąd, zgłoś to do nas: " + error);
+                alert("Wystąpił nieoczekiwany błąd");
             }
         });
     });
 }
 
 function addNewInput() {
+    addToFormData();
     if (checkboxOwn != undefined) {
         isLastPointOwn = checkboxOwn.checked ? true : false;
     }
-    addToFormData();
     previousInputValue = currentPointsIds[lastInput.value];
 	var newInput = document.createElement("input");
 	newInput.type = "text";
