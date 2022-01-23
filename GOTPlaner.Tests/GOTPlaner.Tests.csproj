@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <ProjectReference Include="..\GOTPlaner\GOTPlaner.csproj" />
+    <ProjectReference Include="..\GOTPlaner\GOTPlaner.csproj" />
   </ItemGroup>
 
 </Project>
