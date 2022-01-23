@@ -19,9 +19,6 @@ namespace GOTPlaner.Models
         [Required]
         public DateTime BirthDate { get; set; }
         [Required]
-        [MaxLength(255)]
-        public string Password { get; set; }
-        [Required]
         public bool Disability { get; set; }
         [Required]
         public int IDCard { get; set; }
