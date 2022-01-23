@@ -74,7 +74,8 @@ namespace GOTPlaner.Tests
                 .EnterPointB("value")
                 .EnterPointsAB("10")
                 .EnterPointsBA("10")
-                .EnterLevelDifference("100");
+                .EnterLevelDifference("100")
+                .EnterNumberOfKilometers("");
 
             _page.AddSegment();
 
@@ -89,7 +90,8 @@ namespace GOTPlaner.Tests
                 .EnterPointB("value")
                 .EnterPointsAB("10")
                 .EnterPointsBA("10")
-                .EnterNumberOfKilometers("10");
+                .EnterNumberOfKilometers("10")
+                .EnterLevelDifference("");
 
             _page.AddSegment();
 
